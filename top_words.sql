@@ -13,7 +13,10 @@ $CODE$
     # We only want "words" with alphabetical characters.
     # Note that re.match() only looks at the first character
     # of the word.
-    tokens = list(itertools.chain.from_iterable(token_lists))
+    if len(token_lists) > 1:
+        tokens = list(itertools.chain.from_iterable(token_lists))
+    else:
+        tokens = token_lists
     tokens = [word for word in tokens if re.match('[a-z]', word)]
     
     # Construct a counter of the words and return as JSON
