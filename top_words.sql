@@ -1,7 +1,7 @@
-CREATE OR REPLACE FUNCTION word_counts(raw text)
+﻿CREATE OR REPLACE FUNCTION word_counts(raw text)
 RETURNS json AS
 $CODE$
-    import json, re
+    import json, re, itertools
     from collections import Counter
     from nltk import sent_tokenize, word_tokenize
     
@@ -13,8 +13,11 @@ $CODE$
     # We only want "words" with alphabetical characters.
     # Note that re.match() only looks at the first character
     # of the word.
-    tokens = [word for sublist in token_lists for word in sublist
-                                            if re.match('[a-z]', word)]
+    if len(token_lists) > 1:
+        tokens = list(itertools.chain.from_iterable(token_lists))
+    else:
+        tokens = token_lists
+    tokens = [word for word in tokens if re.match('[a-z]', word)]
     
     # Construct a counter of the words and return as JSON
     the_dict = Counter(tokens)
@@ -29,6 +32,4 @@ $$
     return [word for word, count 
                         in Counter(json.loads(counter)).most_common(num)]
 $$ LANGUAGE plpythonu;
-
-
 

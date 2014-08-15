@@ -1,7 +1,7 @@
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
-temp <- dbGetQuery(pg, "
+system.time(temp <- dbGetQuery(pg, "
     SET work_mem='10GB';
 
     WITH 
@@ -18,7 +18,7 @@ temp <- dbGetQuery(pg, "
       GROUP BY context)
     
     SELECT context, unnest(top_words) AS word
-    FROM by_context;")
+    FROM by_context;"))
 
 rs <- dbDisconnect(pg)
 
