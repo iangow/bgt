@@ -41,12 +41,13 @@ rs <- dbGetQuery(pg, "
          category text, 
          long_words text[])")
 
+rs <- dbDisconnect(pg)
+pg <- dbConnect(PostgreSQL())
 # Get a list of file names for which we need to get tone data.
 file_names <-  dbGetQuery(pg, "
     SELECT DISTINCT file_name
     FROM streetevents.crsp_link
-    WHERE file_name NOT IN (SELECT file_name FROM bgt.long_words)
-    -- LIMIT 100")
+    WHERE file_name NOT IN (SELECT file_name FROM bgt.long_words)")
 
 # Apply function to get tone data. Run on 12 cores.
 library(parallel)

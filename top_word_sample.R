@@ -4,21 +4,9 @@ pg <- dbConnect(PostgreSQL())
 system.time(temp <- dbGetQuery(pg, "
     SET work_mem='10GB';
 
-    WITH 
-
-    raw AS (
-      SELECT context, speaker_text
-      FROM streetevents.speaker_data
-      LIMIT 100000),
-    
-    by_context AS (
-      SELECT context, 
-        top_words(word_counts(string_agg(speaker_text, ' ')), 1000)
-      FROM raw
-      GROUP BY context)
-    
-    SELECT context, unnest(top_words) AS word
-    FROM by_context;"))
+    SELECT sic2,
+        top_words(long_words, 100)
+    FROM bgt.word_freq"))
 
 rs <- dbDisconnect(pg)
 
