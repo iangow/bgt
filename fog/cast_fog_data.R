@@ -1,7 +1,6 @@
 # 
 library(RPostgreSQL)
-drv <- dbDriver("PostgreSQL")
-pg <- dbConnect(drv, dbname="crsp")
+pg <- dbConnect(PostgreSQL())
 library(reshape)
 
 dbGetQuery(pg, "
