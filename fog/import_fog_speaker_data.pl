@@ -33,7 +33,7 @@ for ($i = 0; $i <= 9; $i++) {
   # Use PostgreSQL's COPY function to get data into the database
   $time = localtime; 
   $now_string = strftime "%a %b %e %H:%M:%S %Y", localtime;
-  $filename = "../data/fog_" . $i . ".txt.gz";
+  $filename = "data/results" . $i . ".txt.gz";
   printf "Beginning import of $filename at $now_string\n";  
 
   $cmd  = "gunzip -c \"$filename\" | sed 's/\\\"//g'  ";
