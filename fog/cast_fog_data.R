@@ -64,7 +64,8 @@ dbGetQuery(pg, "
     sum(percent_complex_words/100*num_words) AS num_complex_words,
     sum(num_sentences) AS num_sentences
     FROM (
-      SELECT *, (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context AS category
+      SELECT *, (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context
+        AS category
       FROM bgt.speakers
       WHERE speaker_name != 'Operator') AS b
     GROUP BY file_name, category
@@ -82,7 +83,6 @@ fog.data <- dbGetQuery(pg, "SELECT * FROM bgt.fog_aggregated")
 
 alt.fog.data <- dbGetQuery(pg, "
     SELECT *, 0.4*(num_complex_words/num_sentences FROM bgt.fog_aggregated")
-
 
 cast.data <- NULL
 for (i in setdiff(names(fog.data), c("file_name", "category"))) {
@@ -107,7 +107,8 @@ merged.fog.data <- dbGetQuery(pg, "
   SELECT DISTINCT *, 
     0.4 * (100*(num_complex_words_comp_qa+num_complex_words_anal_qa)/
     (num_words_comp_qa+num_words_anal_qa) +
-    (num_words_comp_qa+num_words_anal_qa)/(num_sentences_comp_qa+num_sentences_anal_qa)) AS fog_qa
+    (num_words_comp_qa+num_words_anal_qa)/(num_sentences_comp_qa+num_sentences_anal_qa)) 
+      AS fog_qa
   FROM bgt.ticker_match
   INNER JOIN bgt.fog_recast
   USING (file_name)")
