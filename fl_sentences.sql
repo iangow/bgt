@@ -23,14 +23,15 @@ $BODY$
 
         fl_pp = r"(?:expected|anticipated|forecasted|projected|believed)"
         fl_be_pp = r"(?:was|were|had|had been)"
-        nfl_regex = re.compile(r"\b" + fl_be_pp + r"\s" +fl_pp, re.I)
+        nfl_regex = re.compile(r"\b" + fl_be_pp + r"\s" + wfl_pp, re.I)
 
         SD["fl_regex"] = fl_regex
         SD["nfl_regex"] = nfl_regex
 
     # rest of function
     fl_sents = [sent for sent in sentences if re.findall(fl_regex, sent) and not re.findall(nfl_regex, sent)]
-    return(len(fl_sents)*1.0/len(sentences))
+    if len(sentences) > 0:
+        return(len(fl_sents)*1.0/len(sentences))
 
 $BODY$
   LANGUAGE plpythonu VOLATILE
