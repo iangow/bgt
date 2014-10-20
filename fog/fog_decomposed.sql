@@ -22,10 +22,12 @@ raw_data AS (
     INNER JOIN link_table AS c
     USING (file_name)
     INNER JOIN bgt.word_freq AS d
-    USING (sic2)
-    LIMIT 1000)
+    USING (sic2))
 SELECT *, 
-    0.4*percent_complex*num_jargon_words/num_complex_words AS fog_jargon,
-    0.4*percent_complex*(1.0-num_jargon_words/num_complex_words::float8) AS fog_special,
-    0.4*num_words/num_sentences AS fog_words_sent
+    CASE WHEN num_complex_words>0 
+        THEN 0.4*percent_complex*num_jargon_words/num_complex_words END AS fog_jargon,
+    CASE WHEN num_complex_words>0 
+        THEN 0.4*percent_complex*(1-num_jargon_words/num_complex_words::float8) END AS fog_special,
+    CASE WHEN num_sentences>0 
+        THEN 0.4*num_words/num_sentences END AS fog_words_sent
 FROM raw_data
