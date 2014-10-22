@@ -27,8 +27,7 @@ add_fl_data <- function(file_name) {
         SELECT file_name, category, prop_fl_sents(array_agg(sents))
         FROM raw_data
         GROUP BY file_name, category"))
-    
-  
+     
     rs <- dbDisconnect(pg)
     
 }
