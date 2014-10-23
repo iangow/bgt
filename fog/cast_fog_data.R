@@ -6,9 +6,9 @@ pg <- dbConnect(PostgreSQL())
 fog.data <- dbGetQuery(pg, "
     SELECT * 
     FROM bgt.fog_decomposed
-    INNER JOIN bgt.fl_data
+    LEFT JOIN bgt.fl_data
     USING (file_name, category)
-    INNER JOIN bgt.word_counts
+    LEFT JOIN bgt.word_counts
     USING (file_name, category)
 ")
 
@@ -31,9 +31,9 @@ fog.call.data <- dbGetQuery(pg, "
     WITH raw_data AS (
         SELECT * 
         FROM bgt.fog_decomposed
-        INNER JOIN bgt.fl_data
+        LEFT JOIN bgt.fl_data
         USING (file_name, category)
-        INNER JOIN bgt.word_counts
+        LEFT JOIN bgt.word_counts
         USING (file_name, category))
     SELECT file_name,
         sum(num_sentences*prop_fl_sents)/sum(num_sentences) AS prop_fl_sents,
