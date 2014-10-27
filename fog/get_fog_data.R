@@ -7,7 +7,8 @@ rs <- dbGetQuery(pg, "
     DROP TABLE IF EXISTS bgt.fog;
 
     CREATE TABLE bgt.fog 
-        (file_name text, category text, fog float8,
+        (file_name text, category text, fog float8, 
+            fog_original float8,
             num_words integer,
             percent_complex float8,
             num_sentences integer)")
