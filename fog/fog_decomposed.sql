@@ -16,7 +16,7 @@ raw_data AS (
     SELECT a.*, 
         (percent_complex/100 * num_words)::integer AS num_complex_words,
         array_length(array_overlap(b.long_words, top_words(d.long_words, 100)), 1) AS num_jargon_words
-    FROM bgt.fog AS a
+    FROM bgt.fog_aggregated AS a
     INNER JOIN bgt.long_words AS b
     USING (file_name, category)
     INNER JOIN link_table AS c

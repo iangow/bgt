@@ -9,8 +9,8 @@ my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", 'igow')
 $sql = "
   -- CREATE SCHEMA bgt;
 
-  DROP TABLE IF EXISTS bgt.speakers;
-  CREATE TABLE bgt.speakers
+  DROP TABLE IF EXISTS bgt.fog_speaker;
+  CREATE TABLE bgt.fog_speaker
 (
   file_name text,
   speaker_name text,
@@ -38,7 +38,7 @@ for ($i = 0; $i <= 9; $i++) {
 
   $cmd  = "gunzip -c \"$filename\" | sed 's/\\\"//g'  ";
   $cmd .=  "| psql -U igow ";
-  $cmd .= "-d $dbname -c \"COPY bgt.speakers FROM STDIN CSV HEADER ";
+  $cmd .= "-d $dbname -c \"COPY bgt.fog_speaker FROM STDIN CSV HEADER ";
   $cmd .= "DELIMITER '\t' \";";
   print "$cmd\n";
   $result = system($cmd);
@@ -48,13 +48,9 @@ for ($i = 0; $i <= 9; $i++) {
   printf "Completed import of $filename at $now_string\n"; 
 }
 
-# Fix permissions and set up indexes
-#$sql = "ALTER TABLE issvoting.npx OWNER TO activism";
-# $dbh->do($sql);
-
 $sql = "
   SET maintenance_work_mem='10GB';
-  CREATE INDEX ON bgt.speakers (file_name);";
+  CREATE INDEX ON bgt.fog_speaker (file_name);";
 #  UPDATE bgt.speakers SET employer=trim(employer);";
 $dbh->do($sql);
 
