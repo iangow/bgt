@@ -7,7 +7,6 @@ DROP TABLE IF EXISTS bgt.fog_aggregated;
 CREATE TABLE bgt.fog_aggregated AS
 WITH aggregated AS (
   SELECT file_name, category,
-    sum(percent_complex_words) AS percent_complex_words,
     sum(num_words) AS num_words, 
     sum(percent_complex_words/100*num_words) AS num_complex_words,
     sum(num_sentences) AS num_sentences

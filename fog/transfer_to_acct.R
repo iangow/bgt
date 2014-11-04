@@ -20,7 +20,9 @@ fog_data <- dbGetQuery(pg,"
         USING (gvkey))
 
     SELECT c.permno, b.call_date::date, 
-        a.*, d.*, e.gvkey, e.rdq
+        a.*, d.r_squared, d.num_obs, d.constant, d.slope, 
+        d.mean_analyst_fog, d.mean_manager_fog,
+        e.gvkey, e.rdq
     FROM bgt.fog_recast AS a
     INNER JOIN streetevents.calls AS b
     USING (file_name)
@@ -31,6 +33,7 @@ fog_data <- dbGetQuery(pg,"
     LEFT JOIN rdq_link AS e
     ON c.permno=e.permno 
         AND b.call_date BETWEEN e.rdq AND e.rdq + interval '3 days'
+    WHERE c.permno IS NOT NULL
 ")
 
 # library(foreign)
@@ -87,7 +90,8 @@ fog_data_ticker <- dbGetQuery(pg,"
             (a.datadate <= b.linkenddt OR b.linkenddt IS NULL))
 
     SELECT e.permno, e.gvkey, e.rdq, b.call_date::date, 
-        a.*, d.*
+        a.*, d.r_squared, d.num_obs, d.constant, d.slope, 
+        d.mean_analyst_fog, d.mean_manager_fog
     FROM bgt.fog_recast AS a
     INNER JOIN streetevents.calls AS b
     USING (file_name)
@@ -95,11 +99,12 @@ fog_data_ticker <- dbGetQuery(pg,"
     USING (file_name)
     LEFT JOIN link_table AS e
     USING (file_name)
+    WHERE e.permno IS NOT NULL
 ")
 
 # library(foreign)
 save(fog_data_ticker, file="data/fog_data_ticker.Rdata")
 system("/Applications/StatTransfer12/st data/fog_data_ticker.Rdata data/fog_data_ticker.sas7bdat -y")
 
-
 dbDisconnect(pg)
+rm(fog_data, fog_data_ticker, pg)

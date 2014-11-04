@@ -8,7 +8,7 @@ fog.data <- dbGetQuery(pg, "
     FROM bgt.fog_decomposed
     LEFT JOIN bgt.fl_data
     USING (file_name, category)
-    LEFT JOIN bgt.word_counts
+    LEFT JOIN bgt.tone_data
     USING (file_name, category)
 ")
 
@@ -33,17 +33,19 @@ fog.call.data <- dbGetQuery(pg, "
         FROM bgt.fog_decomposed
         LEFT JOIN bgt.fl_data
         USING (file_name, category)
-        LEFT JOIN bgt.word_counts
+        LEFT JOIN bgt.tone_data
         USING (file_name, category))
     SELECT file_name,
-        sum(num_sentences*prop_fl_sents)/sum(num_sentences) AS prop_fl_sents,
-        sum(litigious) AS litigious,
-        sum(positive) AS positive,
-        sum(uncertainty) AS uncertainty,
-        sum(negative) AS negative,
-        sum(modal_strong) AS modal_strong,
-        sum(modal_weak) AS modal_weak,
-        sum(word_count) AS word_count
+        CASE WHEN sum(num_sentences)>0 
+            THEN sum(num_sentences*prop_fl_sents)/sum(num_sentences) END 
+        AS prop_fl_sents,
+        sum(litigious)::integer AS litigious,
+        sum(positive)::integer AS positive,
+        sum(uncertainty)::integer AS uncertainty,
+        sum(negative)::integer AS negative,
+        sum(modal_strong)::integer AS modal_strong,
+        sum(modal_weak)::integer AS modal_weak,
+        sum(word_count)::integer AS word_count
     FROM raw_data
     GROUP BY file_name
 ")
