@@ -7,7 +7,11 @@ Pr  rocess for creating `merged_fog_data.sas7bdat`
 - Run `import_stata.sas` to produce `merged_fog_data.sas7bdat`
 
 
-- Run `get_fog_data.R` to produce `bgt.fog`.
+- Run `get_fog_data.R` to produce `bgt.fog`
+
+```
+system("psql -f fog/fog_decomposed.sql")
+```
 - Run `fog_decomposed.sql`, which combines `bgt.fog` and `bgt.jargon_words` to produce `bgt.fog_decomposed`.
 - Run `cast_fog_data.R` to produce `bgt.fog_recast`.
 - Run `transfer_to_acct.R` to produce `fog_data.sas7bdat` and `fog_data_ticker.sas7bdat`.

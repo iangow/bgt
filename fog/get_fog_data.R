@@ -59,5 +59,5 @@ library(parallel)
 system.time(temp <- mclapply(file_names$file_name, get_fog_data, mc.cores=8))
 rs <- dbGetQuery(pg, "
     SET maintenance_work_mem='1GB';
-    CREATE INDEX ON bgt.fog (file_name)")
+    CREATE INDEX ON bgt.fog (file_name, category)")
 rs <- dbDisconnect(pg)

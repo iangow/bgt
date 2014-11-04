@@ -12,7 +12,7 @@ fog.data <- dbGetQuery(pg, "
     USING (file_name, category)
 ")
 
-library(reshape)
+library(reshape2)
 cast.data <- NULL
 for (i in setdiff(names(fog.data), c("file_name", "category"))) {
     temp <- cast(fog.data, file_name ~ category, value=i, fun.aggregate =sum)

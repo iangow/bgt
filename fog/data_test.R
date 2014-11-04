@@ -23,7 +23,12 @@ getNobs(fog_data)
 combined <- merge(original, fog_data, by="file_name", suffixes = c("_old", "_new"))
 
 # Look at correlations between old and new fog variables
-cor(combined$fog_comp_pres_old, combined$fog_comp_pres_new, 
-    use = "complete.obs")
-cor(combined$fog_comp_qa_old, combined$fog_comp_qa_new, use = "complete.obs")
-cor(combined$fog_anal_qa_old, combined$fog_anal_qa_new, use = "complete.obs")
+temp <- expand.grid(var=c("fog", "num_complex_words", "num_words", "num_sentences"),
+                    category=c("comp_pres", "comp_qa", "anal_qa"))
+var_list <- paste0(temp$var, "_", temp$category)
+rm(temp)
+
+for (var in var_list) {
+    cat(var, ":", cor(combined[, paste0(var, "_old")], combined[, paste0(var, "_new")],
+                 use = "complete.obs"), "\n")
+}
