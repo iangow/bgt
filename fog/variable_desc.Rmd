@@ -1,7 +1,6 @@
 ---
 title: "Description of fog-related variables"
 author: "Ian Gow"
-date: "October 18, 2014"
 output: html_document
 ---
 
@@ -20,7 +19,7 @@ The following variables are by "category" (i.e., analyst or company, presentatio
 * `num_sentences`: Number of sentences
 * `num_complex_words`: Number of "complex" words (words with more than three syllables)
 
-`num_jargon_words`: Number of three-syllable words from list of top 100 complex words by two-digit SIC code
+`num_jargon_words` is the number of three-syllable words in the respective portion of the call that are industry jargon, defined as the 100 most common three-syllable words used by firms in the industry based on two-digit SIC codes.
 
 The following three call-category-level variables are a decomposition of fog (add them up to get fog):
 
@@ -32,9 +31,13 @@ The following three call-category-level variables are a decomposition of fog (ad
 
 `word_count`: Word count using Python's Natural Language Toolkit (counts words differently from Perl module used for fog)
 
-These call-category-level variables are from Loughran and McDonald (2013?):
+These call-category-level variables are from Loughran and McDonald (2014) and represent the number of words falling into each category:
 `litigious`, `positive`, `uncertainty`, `negative`, `modal_strong`, `modal_weak`
 
 The following variables are call-level variables based on within-call regressions:
 `r_squared`, `num_obs`, `constant`, `slope`, `mean_analyst_fog`, `mean_manager_fog`
 
+
+### References
+- Li, F. (2010). The Information Content of Forward-Looking Statements in Corporate Filings—A Naïve Bayesian Machine Learning Approach. Journal of Accounting Research, 48(5), 1049–1102. 
+- Loughran, T., & McDonald, B. (2014). Measuring Readability in Financial Disclosures. The Journal of Finance, 69(4), 1643–1671.
