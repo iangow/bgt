@@ -1,2 +1,15 @@
 *.txt.gz
 results0.txt.gz
+<<<<<<< HEAD
+=======
+results1.txt.gz
+results2.txt.gz
+results3.txt.gz
+results4.txt.gz
+results5.txt.gz
+results6.txt.gz
+results7.txt.gz
+results8.txt.gz
+results9.txt.gz
+results.csv
+>>>>>>> 3073c9c5cdf4792f339083bfaf4c71cdf9bd3e05

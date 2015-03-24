@@ -5,7 +5,7 @@ fog_w_tone <- dbGetQuery(pg, "
     SET work_mem='10GB';    
 
     SELECT * 
-    FROM bgt.fog_aggregated
+    FROM bgt.fog
     INNER JOIN bgt.word_counts
     USING (file_name, category)")
 

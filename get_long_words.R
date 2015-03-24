@@ -54,6 +54,6 @@ library(parallel)
 system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=8, mc.preschedule=FALSE))
 rs <- dbGetQuery(pg, "
     SET maintenance_work_mem='1GB';
-    CREATE INDEX ON bgt.word_counts (file_name)")
+    CREATE INDEX ON bgt.long_words (file_name)")
 rs <- dbDisconnect(pg)
 
