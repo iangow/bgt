@@ -1,3 +1,4 @@
+# Get fog data from database ----
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
@@ -9,6 +10,17 @@ fog_data <- dbGetQuery(pg,"
             apermno::integer AS permno
         FROM crsp.ccmxpf_lnkused),
 
+    file_size AS (
+        SELECT file_name, max(file_size) AS file_size
+        FROM streetevents.call_files
+        GROUP BY file_name),
+
+    calls AS (
+        SELECT file_name, call_date::date, file_size
+        FROM streetevents.calls
+        INNER JOIN file_size
+        USING (file_name)),
+
     rdqs AS (
         SELECT DISTINCT gvkey, rdq
         FROM comp.fundq),
@@ -19,12 +31,12 @@ fog_data <- dbGetQuery(pg,"
         INNER JOIN rdqs
         USING (gvkey))
 
-    SELECT c.permno, b.call_date::date, 
+    SELECT c.permno, b.call_date, b.file_size, 
         a.*, d.r_squared, d.num_obs, d.constant, d.slope, 
         d.mean_analyst_fog, d.mean_manager_fog,
         e.gvkey, e.rdq
     FROM bgt.fog_recast AS a
-    INNER JOIN streetevents.calls AS b
+    INNER JOIN calls AS b
     USING (file_name)
     LEFT JOIN streetevents.crsp_link AS c
     USING (file_name)
@@ -36,11 +48,6 @@ fog_data <- dbGetQuery(pg,"
     WHERE c.permno IS NOT NULL
 ")
 
-# library(foreign)
-# rs <- write.dta(dataframe =fog_data, file ="data/fog_data.dta")
-save(fog_data, file="data/fog_data.Rdata")
-system("/Applications/StatTransfer12/st data/fog_data.Rdata data/fog_data.sas7bdat -y")
-
 fog_data_ticker <- dbGetQuery(pg,"
     SET work_mem='1GB';
 
@@ -51,6 +58,11 @@ fog_data_ticker <- dbGetQuery(pg,"
         FROM crsp.ccmxpf_linktable 
         WHERE usedflag=1 AND linkprim IN ('C', 'P')),
     
+    file_size AS (
+        SELECT file_name, max(file_size) AS file_size
+        FROM streetevents.call_files
+        GROUP BY file_name),
+
     calls AS (
         -- Some tickers have *s in them, so I clean them out.
         -- Note that the call data is only from ~2001 through 2010
@@ -58,8 +70,10 @@ fog_data_ticker <- dbGetQuery(pg,"
         -- Note that I just yesterday (2013-05-21) got call data
         -- through to 2013.
         SELECT regexp_replace(ticker, '[*]', '', 'g') AS ticker,
-        file_name, co_name, call_desc, call_date::date
-        FROM streetevents.calls),
+            file_name, co_name, call_desc, call_date::date, file_size
+        FROM streetevents.calls
+        INNER JOIN file_size
+        USING (file_name)),
     
     rdqs AS (
         -- Merge tickers from comp.secm with announcement dates
@@ -89,11 +103,11 @@ fog_data_ticker <- dbGetQuery(pg,"
             a.datadate >= b.linkdt AND
             (a.datadate <= b.linkenddt OR b.linkenddt IS NULL))
 
-    SELECT e.permno, e.gvkey, e.rdq, b.call_date::date, 
+    SELECT e.permno, e.gvkey, e.rdq, b.call_date, b.file_size, 
         a.*, d.r_squared, d.num_obs, d.constant, d.slope, 
         d.mean_analyst_fog, d.mean_manager_fog
     FROM bgt.fog_recast AS a
-    INNER JOIN streetevents.calls AS b
+    INNER JOIN calls AS b
     USING (file_name)
     LEFT JOIN bgt.within_call_data AS d
     USING (file_name)
@@ -102,9 +116,14 @@ fog_data_ticker <- dbGetQuery(pg,"
     WHERE e.permno IS NOT NULL
 ")
 
-# library(foreign)
+dbDisconnect(pg)
+
+# Save data and convert to SAS format ----
+if (!dir.exists("data")) dir.create("data")
+save(fog_data, file="data/fog_data.Rdata")
+system("/Applications/StatTransfer12/st data/fog_data.Rdata data/fog_data.sas7bdat -y")
+
 save(fog_data_ticker, file="data/fog_data_ticker.Rdata")
 system("/Applications/StatTransfer12/st data/fog_data_ticker.Rdata data/fog_data_ticker.sas7bdat -y")
 
-dbDisconnect(pg)
 rm(fog_data, fog_data_ticker, pg)
