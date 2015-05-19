@@ -5,3 +5,10 @@
 *.html
 *.html
 data
+cache
+*.docx
+*.pdf
+fog_math.tex
+*.log
+*.synctex.gz
+*-concordance.tex
