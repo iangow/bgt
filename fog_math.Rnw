@@ -68,42 +68,5 @@ will yield the following
 
 % Regressing \textit{IA} on the fitted values and residuals from managerial fog, we will get $\hat{\gamma_1} < 0$ and $\hat{\gamma_2}$
 
-<<r sim_params, include=FALSE>>=
-n <- 1000000L
-sd_info <- 0.2
-sd_obf <- 0.3
-sd_epsilon <- 0.1
-sd_nu <- 0.4
-delta_1 <- 0.5
-phi_1 <- 0.1 # 0.25
-phi_2 <- 0.42
-@
-
-\section{Simulation}
-
-To check the math above, I simulate some data ($\Sexpr{prettyNum(n)}$ observations) assuming $\sigma_I= \Sexpr{sd_info}$, $\sigma_O= \Sexpr{sd_obf}$, 
- $\sigma_{\epsilon}= \Sexpr{sd_epsilon}$, $\sigma_{\nu}= \Sexpr{sd_nu}$, $\varphi_1= \Sexpr{phi_1}$, $\varphi_2=\Sexpr{phi_2}$, and $\delta_1=\Sexpr{delta_1}$.
-I generate all underlying random variables (i.e., $\textit{InfoNoObf}$, $\textit{Obf}$, $\nu$, and $\epsilon$) as mean-zero, normally distributed, independent variables.
-
-<<r sim_run, include=FALSE, dependson="sim_params", cache=TRUE>>=
-info <- rnorm(n, sd=sd_info)
-obs <- rnorm(n, sd=sd_obf)
-epsilon <- rnorm(n, sd=sd_epsilon)
-nu <- rnorm(n, sd=sd_nu)
-
-y <- info * phi_1 + obs * phi_2 + epsilon
-x <- info * delta_1 + nu
-
-fm <- lm(y ~ x)
-y_fitted <- predict(fm)
-
-coef_expected <- (phi_1 * delta_1 * sd_info^2)/(delta_1^2 * sd_info^2 + sd_nu^2)
-coef_expected
-@
-
-The expected coefficient is \Sexpr{round(coef_expected, digits=4)} and the actual coefficient is \Sexpr{round(fm$coefficients['x'], digits=4)}.
-
-Note that $y - \hat{y}$ is correlated with \textit{InfoNoObf} ($\rho = \Sexpr{round(cor(y-y_fitted, info), digits=4)}$), and $\hat{y}$ is correlated with \textit{InfoNoObf} ($\rho = \Sexpr{round(cor(y_fitted, info), digits=4)}$), even though $\hat{y}$ is uncorrelated with $y - \hat{y}$ ($\rho = \Sexpr{round(cor(y-y_fitted, y_fitted), digits=4)}$)
-
 
 \end{document}
