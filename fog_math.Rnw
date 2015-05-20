@@ -7,20 +7,20 @@
 
 \section{Some pseudo-math}
 
-We assume that the fog of a manager's utterances is a combination of information (\textit{InfoNoObf}), obfuscation (\textit{Obf}).
-We assume that $\textit{InfoNoObf}$ and $\textit{Obf}$ are independent with variances $\sigma^2_I$ and $\sigma^2_O$ respectively.
+We assume that the fog of a manager's utterances is a combination of information (\textit{InfoExObfu}), obfuscation (\textit{Obfu).
+We assume that $\textit{InfoExObfu}$ and $\textit{Obfu$ are independent with variances $\sigma^2_I$ and $\sigma^2_O$ respectively.
 
 We assume that 
-\[  \textit{FogMngr}  = \varphi_0 + \varphi_1 \, \textit{InfoNoObf} + \varphi_2 \textit{Obf} + \epsilon \]
+\[  \textit{FogMngr}  = \varphi_0 + \varphi_1 \, \textit{InfoExObfu} + \varphi_2 \textit{Obfu + \epsilon \]
 where $\varphi_1, \varphi_2 > 0$.
 
 We assume that the analyst's fog reflects only information, not obfuscation
-\[  \textit{FogAnal}  = \delta_0 + \delta_1 \, \textit{InfoNoObf}  + \nu \]
+\[  \textit{FogAnal}  = \delta_0 + \delta_1 \, \textit{InfoExObfu}  + \nu \]
 where $\delta_1 > 0$.
 
 We also assume that the net information disclosed by management on the conference call is increasing in information and decreasing in obfuscation
 
-\[  \textit{NetInfo}  = \textit{InfoNoObf} -  \textit{Obf} + \eta \]
+\[  \textit{NetInfo}  = \textit{InfoExObfu} -  \textit{Obfu \]
 
 \subsection{Regression analyses}
 In the following, for economy of notation, we assume that we have demeaned all variables (equivalent to assuming simply that $\delta_0 = \varphi_0 = 0$). 
@@ -37,22 +37,22 @@ Thus the fitted value from this regression will equal (for a sufficiently large 
 
 \begin{align*}
 \hat{y} &= \hat{\beta_1} x \\
-&= \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \delta_1 \, \textit{InfoNoObf} + \frac{\, \varphi_2 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \\
- &= \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoNoObf} + \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu, 
+&= \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \delta_1 \, \textit{InfoExObfu} + \frac{\, \varphi_2 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \\
+ &= \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu, 
 \end{align*}
 
 Note that the residual will include a component related to information due to attentuation bias:
 %
 \begin{align*}
-y - \hat{y} &= \varphi_1 \, \textit{InfoNoObf}  +  \varphi_2 \, \textit{Obf}  + \epsilon - \left(\frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoNoObf} + \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right) \\
-&=  \varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoNoObf} + \varphi_2 \, \textit{Obf} + \left(\epsilon  - \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right), \\
+y - \hat{y} &= \varphi_1 \, \textit{InfoExObfu}  +  \varphi_2 \, \textit{Obfu  + \epsilon - \left(\frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right) \\
+&=  \varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \varphi_2 \, \textit{Obfu + \left(\epsilon  - \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right), \\
 \end{align*}
 
 \subsection{Information asymmetry}
 
 Regressing $\textit{NetInfo}$ on the fitted value and residuals as follows
 
-\[  \textit{NetInfo}  = \gamma_0 + \gamma_1 \hat{y} + \gamma_2 \hat{\epsilon} + \eta^* \]
+\[  \textit{NetInfo}  = \gamma_0 + \gamma_1 \hat{y} + \gamma_2 \hat{\epsilon} \]
 
 will yield the following 
 
@@ -62,11 +62,14 @@ will yield the following
 &= \frac{\frac{\varphi_1  \sigma^2_{\nu}}{\delta_1^2} - \varphi_2 \sigma^2_O}{\mathrm{var}(\hat{\epsilon})}
 \end{align*}
 
-% We assume that information asymmetry is increasing in information (\textit{InfoNoObf}) and decreasing in  obfuscation (\textit{Obf}), or that in this equation
-%\[  \textit{IA}  = \textit{InfoNoObf}\, \gamma_1 + \textit{Obf} \, \gamma_2 + \xi \]
+\textbf{Relate above to variables in paper.
+
+% We assume that information asymmetry is increasing in information (\textit{InfoExObfu}) and decreasing in  obfuscation (\textit{Obfu), or that in this equation
+%\[  \textit{IA}  = \textit{InfoExObfu}\, \gamma_1 + \textit{Obfu \, \gamma_2 + \xi \]
 %we have $\gamma_1 < 0$ and $\gamma_2 > 0$.
 
 % Regressing \textit{IA} on the fitted values and residuals from managerial fog, we will get $\hat{\gamma_1} < 0$ and $\hat{\gamma_2}$
 
 
 \end{document}
+
