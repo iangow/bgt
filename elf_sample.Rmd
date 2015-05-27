@@ -1,13 +1,13 @@
 ---
-title: "Brian loves ELF"
-author: "Brian Bushee"
+title: "Calculating ELF (\"Easy Listening Factor\")"
+author: "Ian Gow"
 date: "May 27, 2015"
 output: pdf_document
 ---
 
 Get the data for ELF and fog.
 
-```{r get_data_function}
+```{r get_data_function, cache=TRUE}
 get_elf_data <- function(file_name) {
     sql <- paste0("
         
@@ -26,12 +26,13 @@ get_elf_data <- function(file_name) {
         
         sentences AS (
             SELECT file_name, category, 
-            sent_tokenize(all_text) AS sentences,
-            fog_alt(all_text) AS fog
+                elf(sent_tokenize(all_text)) AS elf,
+                fog_alt(all_text) AS fog
             FROM call_text)
         
-        SELECT file_name, category, array_sum(elf(sentences)) AS elf_sum, 
-            array_avg(elf(sentences)) AS elf_mean,
+        SELECT file_name, category, 
+            array_sum(elf) AS elf_sum, 
+            array_avg(elf) AS elf_mean,
             fog
         FROM sentences")
     
@@ -45,11 +46,11 @@ get_elf_data <- function(file_name) {
 
 ```
 
-```{r get_call_list, include=FALSE}
+```{r get_call_list, include=FALSE, cache=TRUE}
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
-n <- 1000L
+n <- 100L
 
 # Get a list of file names for which we need to get tone data.
 file_names <-  dbGetQuery(pg, paste0("
@@ -57,6 +58,9 @@ file_names <-  dbGetQuery(pg, paste0("
     FROM streetevents.calls
     WHERE call_type=1
     LIMIT ", n))
+
+num_calls <- as.integer(dbGetQuery(pg, "SELECT COUNT(*) FROM streetevents.calls WHERE call_type=1")[,1])
+
 rs <- dbDisconnect(pg)
 ```
 
@@ -72,10 +76,18 @@ time_taken <- system.time({
 We get a sample of `r n` calls and store in `file_name`. 
 Then we apply the `get_elf_data` function to each using 12 cores. 
 For `r n` calls, this requires `r time_taken[["elapsed"]]` seconds.
+Thus to get data for all `r prettyNum(num_calls, big.mark = ",")` earnings conference calls 
+would require about `r prettyNum(time_taken[["elapsed"]]/3600 * num_calls/n, digits=2)` hours.
 
-Correlations:
-
-```{r, echo=FALSE, cache=TRUE, dependson="get_sample"}
-cor(elf_data[, c("elf_sum", "elf_mean", "fog")])
+```{r, echo=FALSE, cache=TRUE, dependson="get_sample", include=FALSE}
+corr <- cor(elf_data[, c("elf_sum", "elf_mean", "fog")])
 ```
 
+The correlation between mean ELF and Fog is **`r prettyNum(corr["elf_mean", "fog"], digits=4)`**.
+
+\clearpage
+Here is the Python function `elf` used inside PostgreSQL to produce the ELF data.
+```{r, echo=FALSE, results="markup", comment=NA}
+temp <- paste(system(" psql -h iangow.me -d crsp -c '\\sf elf(text[])'", intern=TRUE), collapse="\n")
+cat(temp)
+```

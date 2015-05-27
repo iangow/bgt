@@ -16,7 +16,8 @@ $BODY$
         def nsyl(word):  
             if word in dic:
                 prons = dic[word]
-                num_syls = [len([syl for syl in pron if re.findall('[0-9]', syl)]) for pron in prons]
+                num_syls = [len([syl for syl in pron 
+                              if re.findall('[0-9]', syl)]) for pron in prons]
                 return max(num_syls)
             else:
                 return 1
@@ -28,7 +29,8 @@ $BODY$
 
     def elf(sentence):
         words = [word.lower() 
-                    for word in nltk.word_tokenize(sentence) if re.findall('[a-zA-Z]', word)]    
+                    for word in nltk.word_tokenize(sentence.decode('utf8')) 
+                            if re.findall('[a-zA-Z]', word)]    
         if len(words)>0:
             return sum([nsyl(word) for word in words]) - len(words)  
         else:
