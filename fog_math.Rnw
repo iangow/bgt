@@ -48,8 +48,8 @@ Thus the fitted value from this regression will equal (for a sufficiently large 
 Note that the residual will include a component related to information due to attentuation bias:
 %
 \begin{align*}
-y - \hat{y} &= \varphi_1 \, \textit{InfoExObfu}  +  \varphi_2 \, \textit{Obfu}  + \epsilon - \left(\frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right) \\ 
-&=  \varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \varphi_2 \, \textit{Obfu} + \left(\epsilon  - \frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right),
+y - \hat{y} &= \varphi_1 \, \textit{InfoExObfu}  +  \varphi_2 \, \textit{Obfu}  + \epsilon - \left(\frac{\varphi_1 \delta_1^2 \sigma^2_I}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right) \\ 
+&=  \varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \varphi_2 \, \textit{Obfu} + \left(\epsilon  - \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right),
 \end{align*}
 
 \subsubsection{Information asymmetry}
