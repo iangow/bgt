@@ -12,3 +12,4 @@ fog_math.tex
 *.log
 *.synctex.gz
 *-concordance.tex
+elf_sample_cache

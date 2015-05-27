@@ -1,0 +1,81 @@
+---
+title: "Brian loves ELF"
+author: "Brian Bushee"
+date: "May 27, 2015"
+output: pdf_document
+---
+
+Get the data for ELF and fog.
+
+```{r get_data_function}
+get_elf_data <- function(file_name) {
+    sql <- paste0("
+        
+        WITH 
+        raw_data AS (
+            SELECT file_name, 
+                (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context
+                    AS category, speaker_text
+            FROM streetevents.speaker_data
+            WHERE file_name='", file_name, "' AND speaker_name != 'Operator'),
+                
+        call_text AS (
+            SELECT file_name, category, string_agg(speaker_text, ' ') AS all_text
+            FROM raw_data
+            GROUP BY file_name, category),
+        
+        sentences AS (
+            SELECT file_name, category, 
+            sent_tokenize(all_text) AS sentences,
+            fog_alt(all_text) AS fog
+            FROM call_text)
+        
+        SELECT file_name, category, array_sum(elf(sentences)) AS elf_sum, 
+            array_avg(elf(sentences)) AS elf_mean,
+            fog
+        FROM sentences")
+    
+    library(RPostgreSQL)
+    pg <- dbConnect(PostgreSQL())
+    elf <- dbGetQuery(pg, sql)
+    rs <- dbDisconnect(pg)
+    
+    return(elf)
+}
+
+```
+
+```{r get_call_list, include=FALSE}
+library(RPostgreSQL)
+pg <- dbConnect(PostgreSQL())
+
+n <- 1000L
+
+# Get a list of file names for which we need to get tone data.
+file_names <-  dbGetQuery(pg, paste0("
+    SELECT DISTINCT file_name
+    FROM streetevents.calls
+    WHERE call_type=1
+    LIMIT ", n))
+rs <- dbDisconnect(pg)
+```
+
+```{r get_sample, include=FALSE, cache=TRUE, dependson=c("get_data_function", "get_call_list")}
+# Apply function to get tone data. Run on 12 cores.
+library(parallel)
+time_taken <- system.time({
+    elf_data <- do.call("rbind", mclapply(file_names$file_name, get_elf_data, mc.cores=12))
+})
+
+```
+
+We get a sample of `r n` calls and store in `file_name`. 
+Then we apply the `get_elf_data` function to each using 12 cores. 
+For `r n` calls, this requires `r time_taken[["elapsed"]]` seconds.
+
+Correlations:
+
+```{r, echo=FALSE, cache=TRUE, dependson="get_sample"}
+cor(elf_data[, c("elf_sum", "elf_mean", "fog")])
+```
+
