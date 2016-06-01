@@ -1,6 +1,6 @@
-﻿SET work_mem='16GB';
+﻿-- Code for the ticker match
+SET work_mem='10GB';
 
--- Code for the ticker match
 DROP TABLE IF EXISTS bgt.ticker_match;
 
 CREATE TABLE bgt.ticker_match AS
