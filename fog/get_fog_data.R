@@ -3,19 +3,20 @@
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
     
-rs <- dbGetQuery(pg, "
-    DROP TABLE IF EXISTS bgt.fog;
-
-    CREATE TABLE bgt.fog 
-        (file_name text, category text, 
-            fog float8, 
-            num_words integer,
-            percent_complex float8,
-            num_sentences integer)")
-
+if (!dbExistsTable(pg, c("bgt", "fog"))) {
+    rs <- dbGetQuery(pg, "
+        CREATE TABLE bgt.fog 
+            (file_name text, category text, 
+                fog float8, 
+                num_words integer,
+                percent_complex float8,
+                num_sentences integer)")
+    
+    rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.fog (file_name, category)")
+}
 rs <- dbDisconnect(pg)
 
-# Make a function to run regressions ----
+# Make a function to get fog data ----
 get_fog_data <- function(file_name) {
     # Function to get statistics for within-call regressions
     # of fog of answers on fog of questions.
@@ -44,7 +45,7 @@ get_fog_data <- function(file_name) {
     dbDisconnect(pg)
 }
 
-# Get list of files and run regressions ------
+# Get list of files without fog data ----
 
 pg <- dbConnect(PostgreSQL())
 
@@ -53,11 +54,12 @@ file_names <-  dbGetQuery(pg, "
     SELECT DISTINCT file_name
     FROM streetevents.calls
     WHERE call_type=1 AND file_name NOT IN (SELECT file_name FROM bgt.fog)")
+rs <- dbDisconnect(pg)
 
-# Apply function to get tone data. Run on 12 cores.
+# Apply function to get fog data ----
+# Run on 12 cores.
+pg <- dbConnect(PostgreSQL())
 library(parallel)
-system.time(temp <- mclapply(file_names$file_name, get_fog_data, mc.cores=8))
-rs <- dbGetQuery(pg, "
-    SET maintenance_work_mem='1GB';
-    CREATE INDEX ON bgt.fog (file_name, category)")
+system.time(temp <- mclapply(file_names$file_name[1:100], get_fog_data, mc.cores=12))
+
 rs <- dbDisconnect(pg)

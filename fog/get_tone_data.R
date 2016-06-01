@@ -1,4 +1,26 @@
+# Create a table to store sent_counts data ----
+library(RPostgreSQL)
+pg <- dbConnect(PostgreSQL())
+   
+if (!dbExistsTable(pg, c("bgt", "sent_counts"))) {
+    rs <- dbGetQuery(pg, "
+        CREATE TABLE bgt.tone_data
+            (
+              file_name text,
+              category text,
+              word_count integer,
+              litigious integer,
+              positive integer,
+              uncertainty integer,
+              negative integer,
+              modal_strong integer,
+              modal_weak integer);
+    
+        CREATE INDEX ON bgt.tone_data (file_name);")
+}
+rs <- dbDisconnect(pg) 
 
+# Make a function to calculate tone variables ----
 # Need to run word_count.sql first.
 addToneData <- function(file_name) {
     # Function to get word count data for all utterances in a call
@@ -43,28 +65,7 @@ addToneData <- function(file_name) {
     }
 }
 
-library(RPostgreSQL)
-pg <- dbConnect(PostgreSQL())
-
-dbGetQuery(pg, "
-    DROP TABLE IF EXISTS bgt.tone_data;
-
-    CREATE TABLE bgt.tone_data
-        (
-          file_name text,
-          category text,
-          word_count integer,
-          litigious integer,
-          positive integer,
-          uncertainty integer,
-          negative integer,
-          modal_strong integer,
-          modal_weak integer);
-
-    SET maintenance_work_mem='1GB';
-    CREATE INDEX ON bgt.tone_data (file_name);
-")
-
+# Get list of files to process ----
 # Get a list of file names for which we need to get tone data.
 file_names <-  dbGetQuery(pg, "
     SELECT file_name
@@ -75,7 +76,8 @@ file_names <-  dbGetQuery(pg, "
     FROM bgt.tone_data;                   
 ")
 
-# Apply function to get tone data. Run on 12 cores.
+# Apply function to get tone data ----
+# Run on 12 cores.
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name, addToneData, mc.cores=8))
 rs <- dbDisconnect(pg)

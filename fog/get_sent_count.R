@@ -1,16 +1,16 @@
-
 # Create a table to store the data ----
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
+   
+if (!dbExistsTable(pg, c("bgt", "sent_counts"))) {
+    rs <- dbGetQuery(pg, "
+        CREATE TABLE bgt.sent_counts 
+            (file_name text, category text, 
+                num_sentences integer)")
     
-rs <- dbGetQuery(pg, "
-    DROP TABLE IF EXISTS bgt.sent_counts;
-
-    CREATE TABLE bgt.sent_counts 
-        (file_name text, category text, 
-            num_sentences integer)")
-
-rs <- dbDisconnect(pg)
+    rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.sent_counts (file_name)")
+}
+rs <- dbDisconnect(pg) 
 
 # Make a function to run regressions ----
 get_sent_count <- function(file_name) {
@@ -43,8 +43,7 @@ get_sent_count <- function(file_name) {
     dbDisconnect(pg)
 }
 
-# Get list of files and run regressions ------
-
+# Get list of files to process ----
 pg <- dbConnect(PostgreSQL())
 
 # Get a list of file names for which we need to get tone data.
@@ -53,11 +52,8 @@ file_names <-  dbGetQuery(pg, "
     FROM streetevents.calls
     WHERE call_type=1 AND file_name NOT IN (SELECT file_name FROM bgt.sent_counts)")
 
-# Apply function to get tone data. Run on 12 cores.
+# Apply function to get sentence count data data ----
+# Run on 12 cores.
 library(parallel)
-# system.time(temp <- lapply(file_names$file_name[1271:3265], get_fog_reg_data))
 system.time(temp <- mclapply(file_names$file_name, get_sent_count, mc.cores=8))
-rs <- dbGetQuery(pg, "
-    SET maintenance_work_mem='1GB';
-    CREATE INDEX ON bgt.sent_counts (file_name)")
 rs <- dbDisconnect(pg)
