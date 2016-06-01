@@ -27,7 +27,7 @@ system("psql -f fog/fog_decomposed.sql")
 - `tone_count.sql`: Creates PL/Python function to get tone words. Depends on `bgt.lm_tone` table.
 - `get_tone_data.R`: Calculates tone variables for earnings conference calls and puts data in `bgt.tone_data`. 
 
-### Jargong word data
+### Jargon word data
 `top_words.sql`: Code to create PL/Python functions `word_counts` and `top_words`.
 `num_jargon_words.sql`
 

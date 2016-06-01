@@ -14,7 +14,8 @@ WITH link_table AS (
         AND (b.call_date <= c.nameenddt OR c.nameenddt IS NULL)
     GROUP BY a.file_name)
 SELECT file_name, category,
-    array_length(array_overlap(b.long_words, top_words(d.long_words, 100)), 1) AS num_jargon_words
+    array_length(array_overlap(b.long_words, 
+    top_words(d.long_words, 100)), 1) AS num_jargon_words
 FROM bgt.long_words AS b
 INNER JOIN link_table AS c
 USING (file_name)
