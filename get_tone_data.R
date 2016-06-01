@@ -9,7 +9,8 @@ addToneData <- function(file_name) {
     tone_raw <- dbGetQuery(pg, paste0("
         WITH raw_data AS (
             SELECT file_name, 
-                (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context AS category,
+                (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || 
+                        '_' || context AS category,
                 speaker_text
             FROM streetevents.speaker_data
             WHERE speaker_name != 'Operator' AND file_name ='", file_name, "')
