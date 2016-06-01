@@ -52,7 +52,7 @@ y - \hat{y} &= \varphi_1 \, \textit{InfoExObfu}  +  \varphi_2 \, \textit{Obfu}  
 &=  \varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I + \sigma^2_{\nu}} \, \textit{InfoExObfu} + \varphi_2 \, \textit{Obfu} + \left(\epsilon  - \frac{\varphi_1 \delta_1 \sigma^2_I}{\delta_1^2  \sigma^2_I + \sigma^2_{\nu}} \nu \right),
 \end{align*}
 
-\subsubsection{Information asymmetry}
+\subsubsection{Liquidity}
 
 We assumed that $\textit{Liquidity}$ measures $\textit{NetInfo}$ with error (denoted $\eta$).
 Regressing $\textit{Liquidity}$ on the fitted value and residuals as follows
@@ -62,7 +62,7 @@ Regressing $\textit{Liquidity}$ on the fitted value and residuals as follows
 will yield the following 
 
 \begin{align*}
-\hat{\gamma}_1 &= \varphi_1 \frac{\hat{\beta}_1 \delta_1 \sigma^2_I}{  \hat{\beta}_1^2 (\delta_1^2 \sigma^2_I + \sigma^2_\nu) } \\
+\hat{\gamma}_1 &= \frac{\hat{\beta}_1 \delta_1 \sigma^2_I}{  \hat{\beta}_1^2 (\delta_1^2 \sigma^2_I + \sigma^2_\nu) } \\
 \hat{\gamma}_2 &= \frac{ \left(\varphi_1  \frac{ \sigma^2_{\nu}}{\delta_1^2 \sigma^2_I} \right) \sigma^2_I - \varphi_2 \sigma^2_O}{\mathrm{var}(\hat{\epsilon})}  \\
 &= \frac{\frac{\varphi_1  \sigma^2_{\nu}}{\delta_1^2} - \varphi_2 \sigma^2_O}{\mathrm{var}(\hat{\epsilon})}
 \end{align*}
@@ -72,6 +72,45 @@ will yield the following
 %we have $\gamma_1 < 0$ and $\gamma_2 > 0$.
 
 % Regressing \textit{IA} on the fitted values and residuals from managerial fog, we will get $\hat{\gamma_1} < 0$ and $\hat{\gamma_2}$
+<<r sim_params, include=FALSE>>=
+n <- 1000000L
+sd_info <- 0.2
+sd_obf <- 0.3
+sd_epsilon <- 0.1
+sd_nu <- 0 # 0.4
+delta_1 <- 0.5
+phi_1 <- 0.1 # 0.25
+phi_2 <- 0.42
+@
+
+\section{Simulation}
+
+To check the math above, I simulate some data ($\Sexpr{prettyNum(n)}$ observations) assuming $\sigma_I= \Sexpr{sd_info}$, $\sigma_O= \Sexpr{sd_obf}$, 
+ $\sigma_{\epsilon}= \Sexpr{sd_epsilon}$, $\sigma_{\nu}= \Sexpr{sd_nu}$, $\varphi_1= \Sexpr{phi_1}$, $\varphi_2=\Sexpr{phi_2}$, and $\delta_1=\Sexpr{delta_1}$.
+I generate all underlying random variables (i.e., $\textit{InfoNoObf}$, $\textit{Obf}$, $\nu$, and $\epsilon$) as mean-zero, normally distributed, independent variables.
+
+<<r sim_run, include=FALSE, dependson="sim_params", cache=TRUE>>=
+info <- rnorm(n, sd=sd_info)
+obf <- rnorm(n, sd=sd_obf)
+epsilon <- rnorm(n, sd=sd_epsilon)
+nu <- rnorm(n, sd=sd_nu)
+
+y <- info * phi_1 + obf * phi_2 + epsilon
+x <- info * delta_1 + nu
+
+fm <- lm(y ~ x)
+y_fitted <- predict(fm)
+
+coef_expected <- (phi_1 * delta_1 * sd_info^2)/(delta_1^2 * sd_info^2 + sd_nu^2)
+coef_expected
+
+# coef_expected_y_hat <- 
+
+@
+
+The expected coefficient is \Sexpr{round(coef_expected, digits=4)} and the actual coefficient is \Sexpr{round(fm$coefficients['x'], digits=4)}.
+
+Note that $y - \hat{y}$ is correlated with \textit{InfoNoObf} ($\rho = \Sexpr{round(cor(y-y_fitted, info), digits=4)}$), and $\hat{y}$ is correlated with \textit{InfoNoObf} ($\rho = \Sexpr{round(cor(y_fitted, info), digits=4)}$), even though $\hat{y}$ is uncorrelated with $y - \hat{y}$ ($\rho = \Sexpr{round(cor(y-y_fitted, y_fitted), digits=4)}$)
 
 \end{document}
 
