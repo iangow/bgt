@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 import re
 
 import curses 
@@ -38,7 +38,7 @@ conn = pg.connect(dbname='crsp')
 #, host='localhost', port=5433)
 df = frame_query(r"""
   SELECT a.*, b.questions, b.answers 
-  FROM bgt.speakers AS a
+  FROM bgt.fog AS a
   INNER JOIN streetevents.qa_pairs AS b
   ON a.file_name=b.file_name AND a.speaker_number = ANY(b.question_nums)
   WHERE percent_complex_words > 30 AND num_words > 20 AND 
