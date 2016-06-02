@@ -1,5 +1,5 @@
 # Create a table to store long-word data ----
-ibrary(RPostgreSQL)
+library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
 if (!dbExistsTable(pg, c("bgt", "long_words"))) {
@@ -44,22 +44,27 @@ addLongWordData <- function(file_name) {
         GROUP BY file_name, category"))
     
     rs <- dbDisconnect(pg)
-    
 }
 
 # Get list of files to process ----
 # Get a list of file names for which we need to get tone data.
-pg <- dbConnect(PostgreSQL())
+library(dplyr)
+pg <- src_postgres()
 
-file_names <-  dbGetQuery(pg, "
-    SELECT DISTINCT file_name
-    FROM streetevents.crsp_link
-    WHERE file_name NOT IN (SELECT file_name FROM bgt.long_words)")
+calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
+
+processed <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
+
+file_names <- 
+    calls %>%
+    filter(call_type==1L) %>%
+    anti_join(processed) %>%
+    select(file_name) %>%
+    distinct() %>%
+    as.data.frame(n=-1)
 
 # Apply function to get data on long words ----
 # Run on 12 cores.
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=8,
                              mc.preschedule=FALSE))
-
-rs <- dbDisconnect(pg)
