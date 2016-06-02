@@ -44,7 +44,7 @@ addToneData <- function(file_name) {
     
     # Convert JSON-as-text to records where each key becomes a column
     # PostgreSQL 9.4 offers json_to_record, but I'm on 9.3.
-    require(RJSONIO)
+    require(jsonlite)
     if (dim(tone_raw)[1]>0) {
         tone_data <- as.data.frame(do.call(rbind,
                                        lapply(tone_raw$tone_count, fromJSON)))
@@ -67,6 +67,8 @@ addToneData <- function(file_name) {
 
 # Get list of files to process ----
 # Get a list of file names for which we need to get tone data.
+pg <- dbConnect(PostgreSQL())
+
 file_names <-  dbGetQuery(pg, "
     SELECT file_name
     FROM streetevents.calls
@@ -75,6 +77,7 @@ file_names <-  dbGetQuery(pg, "
     SELECT file_name
     FROM bgt.tone_data;                   
 ")
+rs <- dbDisconnect(pg) 
 
 # Apply function to get tone data ----
 # Run on 12 cores.
