@@ -16,21 +16,22 @@ data_for_brian <-
     filter(speaker_text !='')
 
 # Calculate fog by passage, and by category ----
-fog_by_passage <-
-    data_for_brian %>%
+calc_stats <- function(df) {
+    df %>%
     mutate(fog_alt=fog_alt(speaker_text),
            fog_original=fog_original(speaker_text),
-           num_words=sql("(fog_data(speaker_text)).num_words")) %>%
-    collect()
+           num_words=sql("(fog_data(speaker_text)).num_words"))
+}
+
+fog_by_passage <-
+    data_for_brian %>%
+    calc_stats
 
 fog_by_category <-
     data_for_brian %>%
     group_by(file_name, category) %>%
     summarize(speaker_text=string_agg(speaker_text, ' ')) %>%
-    mutate(fog_alt=fog_alt(speaker_text),
-           fog_original=fog_original(speaker_text),
-           num_words=sql("(fog_data(speaker_text)).num_words")) %>%
-    collect()
+    calc_stats
 
 # Save data to Excel ----
 library(openxlsx)
