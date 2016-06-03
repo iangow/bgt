@@ -1,38 +1,42 @@
 # Pull together relevant fog data ---
-library(RPostgreSQL)
-pg <- dbConnect(PostgreSQL())
-rs <- dbGetQuery(pg, "
-    DROP VIEW IF EXISTS bgt.data_for_brian;
+library(dplyr)
 
-    CREATE VIEW bgt.data_for_brian AS
-    SELECT *, (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context AS category
-    FROM streetevents.speaker_data
-    WHERE file_name IN ('1032590_T', '1036800_T', '1017960_T', '1036160_T', '1032290_T',
-                        '1022980_T', '1029090_T', '1018710_T', '1018520_T', '1032330_T')
-        AND speaker_text !=''")
+pg <- src_postgres()
+
+speaker_data <- tbl(pg, sql("SELECT * FROM streetevents.speaker_data"))
+
+data_for_brian <-
+    speaker_data %>%
+    mutate(category=sql("(CASE WHEN role='Analyst' THEN 'anal'
+                    ELSE 'comp' END) || '_' || context")) %>%
+    filter(file_name %in% c('1032590_T', '1036800_T', '1017960_T',
+                            '1036160_T', '1032290_T', '1022980_T',
+                            '1029090_T', '1018710_T', '1018520_T',
+                            '1032330_T')) %>%
+    filter(speaker_text !='')
 
 # Calculate fog by passage, and by category ----
-fog_by_passage <- dbGetQuery(pg, "
-    SELECT *, fog_alt(speaker_text), fog_original(speaker_text),
-        (fog_data(speaker_text)).num_words
-    FROM bgt.data_for_brian")
+fog_by_passage <-
+    data_for_brian %>%
+    mutate(fog_alt=fog_alt(speaker_text),
+           fog_original=fog_original(speaker_text),
+           num_words=sql("(fog_data(speaker_text)).num_words")) %>%
+    collect()
 
-fog_by_category <- dbGetQuery(pg, "
-   WITH agg_data AS (
-        SELECT file_name, category, string_agg(speaker_text, ' ') AS speaker_text
-        FROM bgt.data_for_brian
-        GROUP BY file_name, category)
-
-    SELECT file_name, category, fog_alt(speaker_text), fog_original(speaker_text),
-        (fog_data(speaker_text)).num_words
-    FROM agg_data")
-
-rs <- dbGetQuery(pg, "DROP VIEW IF EXISTS bgt.data_for_brian;")
-rs <- dbDisconnect(pg)
+fog_by_category <-
+    data_for_brian %>%
+    group_by(file_name, category) %>%
+    summarize(speaker_text=string_agg(speaker_text, ' ')) %>%
+    mutate(fog_alt=fog_alt(speaker_text),
+           fog_original=fog_original(speaker_text),
+           num_words=sql("(fog_data(speaker_text)).num_words")) %>%
+    collect()
 
 # Save data to Excel ----
-library("xlsx")
-write.xlsx2(fog_by_passage, file="fog_by_passage.xlsx", sheetName="fog_by_passage")
-write.xlsx2(fog_by_category, file="fog_by_category.xlsx", sheetName="fog_by_category")
-file.rename(from="fog_by_passage.xlsx", to="~/Box Sync/BGT/fog_by_passage.xlsx")
-file.rename(from="fog_by_category.xlsx", to="~/Box Sync/BGT/fog_by_category.xlsx")
+library(openxlsx)
+wb <- createWorkbook("data_for_brian")
+addWorksheet(wb, "fog_by_passage")
+writeData(wb, "fog_by_passage", fog_by_passage)
+addWorksheet(wb, "fog_by_category")
+writeData(wb, "fog_by_category", fog_by_category)
+saveWorkbook(wb, "~/Box Sync/BGT/data_for_brian.xlsx", overwrite = TRUE)
