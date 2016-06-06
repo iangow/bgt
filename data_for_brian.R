@@ -5,7 +5,7 @@ pg <- src_postgres()
 
 speaker_data <- tbl(pg, sql("SELECT * FROM streetevents.speaker_data"))
 
-data_for_brian <-
+sample <-
     speaker_data %>%
     mutate(category=sql("(CASE WHEN role='Analyst' THEN 'anal'
                     ELSE 'comp' END) || '_' || context")) %>%
@@ -24,18 +24,18 @@ calc_stats <- function(df) {
 }
 
 fog_by_passage <-
-    data_for_brian %>%
+    sample %>%
     calc_stats
 
 fog_by_category <-
-    data_for_brian %>%
+    sample %>%
     group_by(file_name, category) %>%
     summarize(speaker_text=string_agg(speaker_text, ' ')) %>%
     calc_stats
 
 # Save data to Excel ----
 library(openxlsx)
-wb <- createWorkbook("data_for_brian")
+wb <- createWorkbook("sample")
 addWorksheet(wb, "fog_by_passage")
 writeData(wb, "fog_by_passage", fog_by_passage)
 addWorksheet(wb, "fog_by_category")
