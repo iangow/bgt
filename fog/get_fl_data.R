@@ -39,17 +39,22 @@ add_fl_data <- function(file_name) {
 }
 
 # Get list of files to process ----
-library(RPostgreSQL)
-pg <- dbConnect(PostgreSQL())
+library(dplyr)
+pg <- src_postgres()
 
-# Get a list of file names for which we need to get tone data.
-file_names <-  dbGetQuery(pg, "
-    SELECT DISTINCT file_name
-    FROM streetevents.calls
-    WHERE call_type=1 AND file_name NOT IN (SELECT file_name FROM bgt.fl_data)")
+calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
+
+processed <- tbl(pg, sql("SELECT * FROM bgt.fl_data"))
+
+file_names <-
+    calls %>%
+    filter(call_type==1L) %>%
+    anti_join(processed) %>%
+    select(file_name) %>%
+    distinct() %>%
+    as.data.frame(n=-1)
 
 # Apply function to get data on forward-looking words ----
 # Run on 12 cores.
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name, add_fl_data, mc.cores=8))
-rs <- dbDisconnect(pg)
