@@ -11,6 +11,7 @@ fl_data <- tbl_pg("fl_data")
 sent_counts <- tbl_pg("sent_counts")
 tone_data <- tbl_pg("tone_data")
 long_words <- tbl_pg("long_words")
+within_call_data <- tbl_pg("within_call_data")
 ticker_match <- tbl_pg("ticker_match")
 
 calls <-
@@ -22,7 +23,6 @@ latest_calls <-
     summarize(last_update=max(last_update)) %>%
     inner_join(calls) %>%
     select(file_name, last_update, call_date)
-
 
 fog <-
     tbl_pg("fog") %>%
@@ -53,8 +53,6 @@ fog_decomposed <-
            fog_words_sent_correct=fog_words_sent_correct_sql,
            fog_words_sent_error=fog_words_sent_error_sql) %>%
     compute()
-
-within_call_data <- tbl_pg("within_call_data")
 
 call_level_tone_data <-
     tone_data %>%
@@ -127,3 +125,4 @@ long_words %>%
     summarize(n()) %>%
     arrange(year) %>%
     print(n=100)
+
