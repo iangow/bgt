@@ -47,14 +47,13 @@ get_fog_reg_data <- function(file_name) {
                    mean_manager_fog=sql("NULL::float8")) %>%
             as.data.frame()
 
-    speaker_data <-
-        tbl(pg, sql("SELECT * FROM streetevents.speaker_data")) %>%
+    fog_speaker <-
+        tbl(pg, sql("SELECT * FROM bgt.fog_speaker")) %>%
         filter(context=='qa') %>%
         inner_join(latest_update) %>%
-        select(file_name, last_update, speaker_number, speaker_text) %>%
         filter(file_name==file_name_str)
 
-    nrows <- speaker_data %>% summarize(n()) %>% collect() %>% .[[1]]
+    nrows <- fog_speaker %>% summarize(n()) %>% collect() %>% .[[1]]
 
     if (nrows != 0) {
         questions <-
@@ -63,23 +62,33 @@ get_fog_reg_data <- function(file_name) {
                    answer_number=unnest(answer_nums)) %>%
             select(file_name, last_update, question_nums, question_number, answer_number)
 
-        reg_data <-
+        fog_questions <-
             questions %>%
             filter(file_name==file_name_str) %>%
-            inner_join(speaker_data %>%
-                           rename(question_number=speaker_number,
-                                  question=speaker_text)) %>%
-            inner_join(speaker_data %>%
-                           rename(answer_number=speaker_number,
-                                  answer=speaker_text)) %>%
+            inner_join(fog_speaker %>%
+                           rename(question_number=speaker_number)) %>%
             group_by(file_name, last_update, question_nums) %>%
-            summarize(fog_questions=fog(string_agg(question, ' ')),
-                      fog_answers=fog(string_agg(answer, ' '))) %>%
-            select(file_name, last_update, fog_answers, fog_questions) %>%
-            compute()
+            summarize(percent_complex = sum(percent_complex*num_words)/sum(num_words),
+                   num_sentences = sum(num_sentences),
+                   num_words = sum(num_words)) %>%
+            mutate(fog_questions = 0.4 * (percent_complex + num_words/num_sentences)) %>%
+            select(file_name, last_update, question_nums, fog_questions)
+
+        fog_answers <-
+            questions %>%
+            filter(file_name==file_name_str) %>%
+            inner_join(fog_speaker %>%
+                           rename(answer_number=speaker_number)) %>%
+            group_by(file_name, last_update, question_nums) %>%
+            summarize(percent_complex = sum(percent_complex*num_words)/sum(num_words),
+                   num_sentences = sum(num_sentences),
+                   num_words = sum(num_words)) %>%
+            mutate(fog_answers = 0.4 * (percent_complex + num_words/num_sentences)) %>%
+            select(file_name, last_update, question_nums, fog_answers)
 
         reg_results <-
-            reg_data %>%
+            fog_questions %>%
+            inner_join(fog_answers) %>%
             group_by(file_name, last_update) %>%
             summarize(r_squared=regr_r2(fog_questions, fog_answers),
                       num_obs=regr_count(fog_questions, fog_answers),
@@ -105,9 +114,7 @@ get_fog_reg_data <- function(file_name) {
 
 pg <- src_postgres()
 
-# Get a list of file names for which we need to get tone data.
-
-
+# Get a list of file names for which we need to get within-call data.
 latest_update <-
     tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
     filter(call_type==1L) %>%
@@ -117,17 +124,15 @@ latest_update <-
 qa_pairs <-
     tbl(pg, sql("SELECT * FROM streetevents.qa_pairs"))
 
-
 within_call_data <-
-    tbl(pg, sql("SELECT * FROM bgt.within_call_data")) %>%
-    select(file_name, last_update)
+    tbl(pg, sql("SELECT * FROM bgt.within_call_data"))
 
 file_names <-
     qa_pairs %>%
     select(file_name, last_update) %>%
     inner_join(latest_update) %>%
-    anti_join(within_call_data) %>%
-    collect(n=1000)
+    anti_join(within_call_data %>% select(file_name, last_update)) %>%
+    collect(n=100)
 
 dbDisconnect(pg$con)
 
