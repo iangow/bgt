@@ -1,136 +1,137 @@
+library(dplyr)
 
 # Create a table to store the data ----
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
 if (!dbExistsTable(pg, c("bgt", "within_call_data"))) {
+
     rs <- dbGetQuery(pg, "
+
         CREATE TABLE bgt.within_call_data
-            (file_name text, last_update timestamp without time zone,
+            (file_name text,
+             last_update timestamp without time zone,
              r_squared float8, num_obs integer,
              constant float8,
              slope float8, mean_analyst_fog float8,
-             mean_manager_fog float8);
+             mean_manager_fog float8)")
 
-        CREATE INDEX ON bgt.within_call_data (file_name)")
+    rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.within_call_data (file_name)")
 }
 
 rs <- dbDisconnect(pg)
 
 # Make a function to run regressions ----
 get_fog_reg_data <- function(file_name) {
+
     # Function to get statistics for within-call regressions
     # of fog of answers on fog of questions.
 
-    library(RPostgreSQL)
-    pg <- dbConnect(PostgreSQL())
+    file_name_str <- file_name
 
-    # Get fog data
-    reg_data <- dbGetQuery(pg, paste0("
-        DELETE FROM bgt.within_call_data
-        WHERE file_name='", file_name, "';
+    pg <- src_postgres()
 
-        WITH
-        latest_call AS (
-            SELECT file_name, max(last_update) AS last_update
-            FROM streetevents.calls
-            WHERE file_name='", file_name, "'
-            GROUP BY file_name),
+    latest_update <-
+        tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
+        filter(file_name==file_name_str) %>%
+        group_by(file_name) %>%
+        summarize(last_update=max(last_update))
 
-        question_nums AS (
-            SELECT file_name, last_update, question_nums,
-                UNNEST(question_nums) AS speaker_number
-            FROM streetevents.qa_pairs
-            INNER JOIN latest_call
-            USING (file_name, last_update)),
+    empty_res <-
+            latest_update %>%
+            mutate(r_squared=sql("NULL::float8"),
+                   num_obs=sql("NULL::float8"),
+                   constant=sql("NULL::float8"),
+                   slope=sql("NULL::float8"),
+                   mean_analyst_fog=sql("NULL::float8"),
+                   mean_manager_fog=sql("NULL::float8")) %>%
+            as.data.frame()
 
-        questions AS (
-            SELECT file_name, last_update, question_nums,
-                string_agg(speaker_text, ' ') AS questions
-            FROM streetevents.speaker_data
-            INNER JOIN question_nums
-            USING (file_name, last_update, speaker_number)
-            GROUP BY file_name, last_update, question_nums),
+    speaker_data <-
+        tbl(pg, sql("SELECT * FROM streetevents.speaker_data")) %>%
+        filter(context=='qa') %>%
+        inner_join(latest_update) %>%
+        select(file_name, last_update, speaker_number, speaker_text) %>%
+        filter(file_name==file_name_str)
 
-        answer_nums AS (
-            SELECT file_name, last_update, question_nums,
-                UNNEST(answer_nums) AS speaker_number
-            FROM streetevents.qa_pairs
-            INNER JOIN latest_call
-            USING (file_name, last_update)),
+    nrows <- speaker_data %>% summarize(n()) %>% collect() %>% .[[1]]
 
-        answers AS (
-            SELECT file_name, last_update, question_nums,
-                string_agg(speaker_text, ' ') AS answers
-            FROM streetevents.speaker_data
-            INNER JOIN answer_nums
-            USING (file_name, last_update, speaker_number)
-            GROUP BY file_name, last_update, question_nums)
+    if (nrows != 0) {
+        questions <-
+            tbl(pg, sql("SELECT * FROM streetevents.qa_pairs")) %>%
+            mutate(question_number=unnest(question_nums),
+                   answer_number=unnest(answer_nums)) %>%
+            select(file_name, last_update, question_nums, question_number, answer_number)
 
-        SELECT file_name, last_update,
-            fog(questions) AS fog_questions,
-            fog(answers) AS fog_answers
-        FROM answers
-        INNER JOIN questions
-        USING (file_name, last_update, question_nums)"))
+        reg_data <-
+            questions %>%
+            filter(file_name==file_name_str) %>%
+            inner_join(speaker_data %>%
+                           rename(question_number=speaker_number,
+                                  question=speaker_text)) %>%
+            inner_join(speaker_data %>%
+                           rename(answer_number=speaker_number,
+                                  answer=speaker_text)) %>%
+            group_by(file_name, last_update, question_nums) %>%
+            summarize(fog_questions=fog(string_agg(question, ' ')),
+                      fog_answers=fog(string_agg(answer, ' '))) %>%
+            select(file_name, last_update, fog_answers, fog_questions) %>%
+            compute()
 
-    # Exit if there are no data.
-    if (dim(reg_data)[1]==0) {
-        dbDisconnect(pg)
-        # print("No data")
-        return(NA)
+        reg_results <-
+            reg_data %>%
+            group_by(file_name, last_update) %>%
+            summarize(r_squared=regr_r2(fog_questions, fog_answers),
+                      num_obs=regr_count(fog_questions, fog_answers),
+                      constant=regr_intercept(fog_questions, fog_answers),
+                      slope=regr_slope(fog_questions, fog_answers),
+                      mean_analyst_fog=regr_avgx(fog_questions, fog_answers),
+                      mean_manager_fog=regr_avgy(fog_questions, fog_answers)) %>%
+            collect() %>%
+            as.data.frame()
+    } else {
+        reg_results <- empty_res
     }
-
-    # Run regression and collate statistics
-    fitted.model <- lm(fog_answers ~ fog_questions, data=reg_data)
-    summ <- summary(fitted.model)
-
-    # Exit if the regression didn't have enough data
-    if (dim(summ$coefficients)[1]<2) {
-        dbDisconnect(pg)
-        #  print("Insufficient data")
-        return(NA)
-    }
-
-    # Organize regression statistics
-    results <-
-        data.frame(
-            file_name=reg_data$file_name[1],
-            last_update=reg_data$last_update[1],
-            r_squared=summ$r.squared,
-            num_obs=sum(summ$df[1:2]),
-            constant=summ$coefficients[1,1],
-            slope=summ$coefficients[2,1],
-            mean_analyst_fog=mean(reg_data$fog_questions),
-            mean_manager_fog=mean(reg_data$fog_answers),
-        stringsAsFactors=FALSE)
 
     # Push to database.
-    dbWriteTable(pg, c("bgt", "within_call_data"), results,
+    dbWriteTable(pg$con, c("bgt", "within_call_data"), reg_results,
                  append=TRUE, row.names=FALSE)
+    dbDisconnect(pg$con)
 
-    dbDisconnect(pg)
+    return(TRUE)
 }
-rs <- dbDisconnect(pg)
 
-# Get list of files to process ----
+# Get list of files and run regressions ------
 
-# Get a list of file names for which we need to get
-# within-call regression data
-pg <- dbConnect(PostgreSQL())
+pg <- src_postgres()
 
-file_names <-  dbGetQuery(pg, "
-    SELECT file_name, max(last_update) AS last_update
-    FROM streetevents.calls
-    WHERE call_type=1
-    GROUP BY file_name
-    EXCEPT
-    SELECT file_name, last_update
-    FROM bgt.within_call_data")
-rs <- dbDisconnect(pg)
+# Get a list of file names for which we need to get tone data.
 
-# Apply function to get within-call regression data ----
-# Run on 8 cores.
+
+latest_update <-
+    tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
+    filter(call_type==1L) %>%
+    group_by(file_name) %>%
+    summarize(last_update=max(last_update))
+
+qa_pairs <-
+    tbl(pg, sql("SELECT * FROM streetevents.qa_pairs"))
+
+
+within_call_data <-
+    tbl(pg, sql("SELECT * FROM bgt.within_call_data")) %>%
+    select(file_name, last_update)
+
+file_names <-
+    qa_pairs %>%
+    select(file_name, last_update) %>%
+    inner_join(latest_update) %>%
+    anti_join(within_call_data) %>%
+    collect(n=1000)
+
+dbDisconnect(pg$con)
+
+# Apply function to get tone data. Run on 12 cores.
 library(parallel)
-system.time(temp <- mclapply(file_names$file_name, get_fog_reg_data,
-                             mc.cores=8))
+# system.time(temp <- lapply(file_names$file_name, get_fog_reg_data))
+system.time(temp <- mclapply(file_names$file_name, get_fog_reg_data, mc.cores=8))
