@@ -1,57 +1,58 @@
-# 
+#
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
-library(reshape)
+# library(reshape)
+library(dplyr)
 
-dbGetQuery(pg, "
-    -- Code for the ticker match
-    SET work_mem='10GB';
+pg <- src_postgres()
 
-    DROP TABLE IF EXISTS bgt.ticker_match;
-    
-    CREATE TABLE bgt.ticker_match AS
-    WITH 
-    linktable AS (
-        SELECT gvkey, lpermno::integer AS permno, linkdt, linkenddt
-        FROM crsp.ccmxpf_linktable 
-        WHERE usedflag=1 AND linkprim IN ('C', 'P')),
+linktable <-
+    tbl(pg, sql("SELECT * FROM crsp.ccmxpf_linktable")) %>%
+    filter(usedflag==1L, linkprim %in% c('C', 'P')) %>%
+    mutate(permno=as.integer(lpermno)) %>%
+    select(gvkey, permno, linkdt, linkenddt)
 
-    calls AS (
-        -- Some tickers have *s in them, so I clean them out.
-        -- Note that the call data is only from ~2001 through 2010
-        -- so I condition on this below when merging with Compustat.
-        -- Note that I just yesterday (2013-05-21) got call data
-        -- through to 2013.
-        SELECT regexp_replace(ticker, '[*]', '', 'g') AS ticker,
-        file_name, co_name, call_desc, call_date::date
-        FROM streetevents.calls),
+# - Some tickers have *s in them, so I clean them out.
+calls <-
+    tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
+    mutate(ticker=regexp_replace(ticker, '[*]', '', 'g')) %>%
+    mutate(call_date=sql("call_date::date")) %>%
+    select(file_name, co_name, call_desc, call_date, last_update, ticker) %>%
+    group_by(file_name) %>%
+    filter(last_update==max(last_update))
 
-    rdqs AS (
-        -- Merge tickers from comp.secm with announcement dates
-        -- from comp.fundq
-        SELECT DISTINCT a.gvkey, b.tic, a.rdq, a.conm, a.datadate
-        FROM comp.secm AS b
-        RIGHT JOIN comp.fundq AS a
-        ON a.gvkey=b.gvkey AND eomonth(b.datadate)=eomonth(a.rdq)),
+fundq <-
+    tbl(pg, sql("SELECT * FROM comp.fundq")) %>%
+    mutate(month=eomonth(rdq)) %>%
+    select(gvkey, datadate, rdq, conm, month)
 
-    ticker_match AS (
-        -- Match earnings announcements with calls within three days
-        -- and with the same ticker
-        SELECT a.*, b.gvkey, b.rdq, b.datadate
-        FROM calls AS a
-        INNER JOIN rdqs AS b
-        ON a.ticker=b.tic AND 
-        -- 2012-09-30 is the latest data on comp.secm. Assume that tickers after 
-        -- that date are good.
-        a.call_date BETWEEN b.rdq AND b.rdq + interval '3 days')
-    -- Finally add PERMNO
-    SELECT a.*, b.permno
-    FROM ticker_match AS a
-    LEFT JOIN linktable AS b
-    ON a.gvkey=b.gvkey AND 
-    a.datadate >= b.linkdt AND
-    (a.datadate <= b.linkenddt OR b.linkenddt IS NULL);
-    
-    CREATE INDEX ON bgt.ticker_match (file_name);")
+secm <-
+    tbl(pg, sql("SELECT * FROM comp.secm")) %>%
+    mutate(month=eomonth(datadate)) %>%
+    select(gvkey, month, tic)
 
-rs <- dbDisconnect(pg)
+rdqs <-
+    fundq %>%
+    left_join(secm) %>%
+    select(gvkey, tic, rdq, conm, datadate) %>%
+    rename(ticker=tic) %>%
+    distinct() %>%
+    compute()
+
+# Match earnings announcements with calls within three days
+# and with the same ticker
+ticker_match <-
+    calls %>%
+    inner_join(rdqs) %>%
+    filter(between(call_date, rdq, sql("rdq + interval '3 days'")))
+
+ticker_match %>%
+    left_join(linktable) %>%
+    filter(datadate >= linkdt, datadate <= linkenddt || is.na(linkenddt)) %>%
+    compute(name="ticker_match", indexes="file_name", temporary=FALSE)
+rs <-
+    RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.ticker_match")
+rs <- RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE ticker_match SET SCHEMA bgt")
+
+# Merge tickers from comp.secm with announcement dates
+# from comp.fundqrdqs <-
