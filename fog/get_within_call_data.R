@@ -86,11 +86,15 @@ get_fog_reg_data <- function(file_name) {
             mutate(fog_answers = 0.4 * (percent_complex + num_words/num_sentences)) %>%
             select(file_name, last_update, question_nums, fog_answers)
 
-        reg_results <-
+
+        reg_data <-
             fog_questions %>%
             inner_join(fog_answers) %>%
             group_by(file_name, last_update) %>%
-            rename(y=fog_answers, x=fog_questions) %>%
+            rename(y=fog_answers, x=fog_questions)
+
+        reg_results <-
+            reg_data %>%
             summarize(r_squared=regr_r2(y, x),
                       num_obs=regr_count(y, x),
                       constant=regr_intercept(y, x),
@@ -134,11 +138,11 @@ file_names <-
     inner_join(latest_update) %>%
     anti_join(within_call_data %>% select(file_name, last_update)) %>%
     distinct() %>%
-    collect(n=1000)
+    collect(n=Inf)
 
 dbDisconnect(pg$con)
 
-# Apply function to get tone data. Run on 12 cores.
+# Apply function to get tone data. Run on several cores. ----
 library(parallel)
 # system.time(temp <- lapply(file_names$file_name, get_fog_reg_data))
 system.time(temp <- mclapply(file_names$file_name, get_fog_reg_data, mc.cores=8))
