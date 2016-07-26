@@ -90,12 +90,13 @@ get_fog_reg_data <- function(file_name) {
             fog_questions %>%
             inner_join(fog_answers) %>%
             group_by(file_name, last_update) %>%
-            summarize(r_squared=regr_r2(fog_questions, fog_answers),
-                      num_obs=regr_count(fog_questions, fog_answers),
-                      constant=regr_intercept(fog_questions, fog_answers),
-                      slope=regr_slope(fog_questions, fog_answers),
-                      mean_analyst_fog=regr_avgx(fog_questions, fog_answers),
-                      mean_manager_fog=regr_avgy(fog_questions, fog_answers)) %>%
+            rename(y=fog_answers, x=fog_questions) %>%
+            summarize(r_squared=regr_r2(y, x),
+                      num_obs=regr_count(y, x),
+                      constant=regr_intercept(y, x),
+                      slope=regr_slope(y, x),
+                      mean_analyst_fog=regr_avgx(y, x),
+                      mean_manager_fog=regr_avgy(y, x)) %>%
             collect() %>%
             as.data.frame()
     } else {
@@ -132,7 +133,8 @@ file_names <-
     select(file_name, last_update) %>%
     inner_join(latest_update) %>%
     anti_join(within_call_data %>% select(file_name, last_update)) %>%
-    collect(n=100)
+    distinct() %>%
+    collect(n=1000)
 
 dbDisconnect(pg$con)
 
