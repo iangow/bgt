@@ -16,7 +16,7 @@ if (!dbExistsTable(pg, c("bgt", "within_call_data"))) {
              slope float8, mean_analyst_fog float8,
              mean_manager_fog float8)")
 
-    rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.within_call_data (file_name)")
+    rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.within_call_data (file_name, last_update)")
 }
 
 rs <- dbDisconnect(pg)
@@ -119,6 +119,7 @@ get_fog_reg_data <- function(file_name) {
 
 pg <- src_postgres()
 
+dbGetQuery(pg$con, "SET work_mem='3GB'")
 # Get a list of file names for which we need to get within-call data.
 latest_update <-
     tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
@@ -136,6 +137,7 @@ file_names <-
     qa_pairs %>%
     select(file_name, last_update) %>%
     inner_join(latest_update) %>%
+    distinct() %>%
     anti_join(within_call_data %>% select(file_name, last_update)) %>%
     distinct() %>%
     collect(n=Inf)
