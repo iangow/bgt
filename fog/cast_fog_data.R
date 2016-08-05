@@ -9,8 +9,9 @@ tbl_pg <- function(table) {
 
 fl_data <- tbl_pg("fl_data")
 sent_counts <- tbl_pg("sent_counts")
-tone_data <- tbl_pg("tone_data")
+tone_data <- tbl_pg("tone_data") %>% select(file_name, last_update, category, everything())
 long_words <- tbl_pg("long_words")
+other_measures <- tbl_pg("other_measures")
 within_call_data <- tbl_pg("within_call_data")
 ticker_match <- tbl_pg("ticker_match")
 
@@ -47,6 +48,7 @@ fog_decomposed <-
     summarize(num_jargon_words=sql("max(num_jargon_words)::float8")) %>%
     inner_join(fog %>% select(-num_sentences)) %>%
     inner_join(sent_counts) %>%
+    inner_join(other_measures) %>%
     mutate(num_words=sql("num_words::float8")) %>%
     mutate(fog_jargon=fog_jargon_sql,
            fog_special=fog_special_sql,
@@ -72,7 +74,7 @@ fog.data <-
 # Recast data so that three rows expand into 3*K columns
 cast.data <-
     fog.data %>%
-    gather(key, value, -file_name, -category) %>%
+    gather(key, value, -file_name, -last_update, -category) %>%
     unite(var, c(key, category), sep="_") %>%
     spread(var, value) %>%
     tbl_df() %>%
@@ -96,6 +98,8 @@ rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
         SET maintenance_work_mem='5GB';
         CREATE INDEX ON bgt.fog_recast (file_name)")
+
+fog_recast <- tbl_pg("fog_recast")
 
 merged.fog.data <-
     tbl(pg, sql("
