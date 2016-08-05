@@ -4,10 +4,7 @@ pg <- src_postgres()
 
 long_words <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
 
-set.seed(2016)
-n_letters <- 6
-the_letters <- sample(letters, n_letters, replace = FALSE)
-the_regex <- paste0("^[", paste(the_letters, collapse=""), "]")
+the_regex <- paste0("^[bgt]")
 
 dbGetQuery(pg$con, "
 CREATE OR REPLACE FUNCTION regex_count(text[], text)
@@ -23,6 +20,7 @@ $CODE$ LANGUAGE sql IMMUTABLE STRICT")
 
 dbGetQuery(pg$con, "SET work_mem='3GB'")
 
+RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS random_feature")
 RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.random_feature")
 
 random_feature <-
@@ -33,10 +31,10 @@ random_feature <-
     select(-long_words, -match_count, -word_count) %>%
     compute(name="random_feature", temporary=FALSE)
 
-RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE random_measure SET SCHEMA bgt")
+RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE random_feature SET SCHEMA bgt")
 
-random_feature <- tbl(pg, sql("SELECT * FROM bgt.random_measure"))
+random_feature <- tbl(pg, sql("SELECT * FROM bgt.random_feature"))
 
 random_feature %>%
-    filter(category=="anal_qa")
+    arrange(file_name)
 
