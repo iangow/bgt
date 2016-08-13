@@ -5,7 +5,8 @@ pg <- dbConnect(PostgreSQL())
 if (!dbExistsTable(pg, c("bgt", "fl_data"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.fl_data
-            (file_name text, category text, prop_fl_sents float8)")
+            (file_name text, last_update timestamp without time zone,
+                     category text, prop_fl_sents float8)")
 
     rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.fl_data (file_name)")
 }
@@ -23,16 +24,16 @@ add_fl_data <- function(file_name) {
     rs <- dbGetQuery(pg, paste0("
 
         WITH raw_data AS (
-            SELECT file_name, speaker_name, speaker_number,
+            SELECT file_name, last_update, speaker_name, speaker_number,
                 unnest(sent_tokenize(speaker_text)) AS sents,
                 (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END)
                     || '_' || context AS category
             FROM streetevents.speaker_data
             WHERE speaker_name != 'Operator' AND file_name = '", file_name, "')
-        INSERT INTO bgt.fl_data
-        SELECT file_name, category, prop_fl_sents(array_agg(sents))
+        INSERT INTO bgt.fl_data (file_name, last_update, category, prop_fl_sents)
+        SELECT file_name, last_update, category, prop_fl_sents(array_agg(sents))
         FROM raw_data
-        GROUP BY file_name, category"))
+        GROUP BY file_name, last_update, category"))
 
     rs <- dbDisconnect(pg)
 
@@ -52,7 +53,7 @@ file_names <-
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=-1)
+    as.data.frame(n=Inf)
 
 # Apply function to get data on forward-looking words ----
 # Run on 12 cores.
