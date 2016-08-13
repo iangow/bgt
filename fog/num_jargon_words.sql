@@ -11,7 +11,7 @@ latest_calls AS (
 
 link_table AS (
     SELECT a.file_name,
-        floor(c.siccd/100)::int) AS sic2
+        min(floor(c.siccd/100))::int AS sic2
     FROM streetevents.crsp_link AS a
     INNER JOIN streetevents.calls AS b
     USING (file_name)
