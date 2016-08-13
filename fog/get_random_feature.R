@@ -7,16 +7,15 @@ long_words <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
 the_regex <- paste0("^[bgt]")
 
 dbGetQuery(pg$con, "
-CREATE OR REPLACE FUNCTION regex_count(text[], text)
-RETURNS bigint AS
-$CODE$
-    WITH words AS (
-        SELECT UNNEST($1) AS word)
-    SELECT COUNT(*)
-    FROM words
-    WHERE word ~ $2
-$CODE$ LANGUAGE sql IMMUTABLE STRICT")
-
+    CREATE OR REPLACE FUNCTION regex_count(text[], text)
+    RETURNS bigint AS
+    $CODE$
+        WITH words AS (
+            SELECT UNNEST($1) AS word)
+        SELECT COUNT(*)
+        FROM words
+        WHERE word ~ $2
+    $CODE$ LANGUAGE sql IMMUTABLE STRICT")
 
 dbGetQuery(pg$con, "SET work_mem='3GB'")
 
