@@ -4,7 +4,7 @@
 .*.swp
 *.html
 *.html
-data
+data/*.Rdata
 cache
 *.docx
 *.pdf
