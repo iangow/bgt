@@ -6,7 +6,8 @@ pg <- dbConnect(PostgreSQL())
 if (!dbExistsTable(pg, c("bgt", "fog"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.fog
-            (file_name text, category text,
+            (file_name text, last_update timestamp without time zone,
+             category text,
              fog float8, num_words integer, percent_complex float8,
              num_sentences integer, fog_original float8,
              num_sentences_original integer)")
@@ -25,20 +26,22 @@ get_fog_data <- function(file_name) {
 
     # Get fog data
     reg_data <- dbGetQuery(pg, paste0("
-        INSERT INTO bgt.fog
+        INSERT INTO bgt.fog (file_name, last_update, category,
+                             fog, num_words, percent_complex,
+                             num_sentences, fog_original, num_sentences_original)
         WITH raw_data AS (
-            SELECT file_name, 
+            SELECT file_name, last_update,
                 (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context
                     AS category, speaker_text
             FROM streetevents.speaker_data
             WHERE file_name='", file_name, "' AND speaker_name != 'Operator'),
 
         call_text AS (
-            SELECT file_name, category, string_agg(speaker_text, ' ') AS all_text
+            SELECT file_name, last_update, category, string_agg(speaker_text, ' ') AS all_text
             FROM raw_data
             GROUP BY file_name, category)
 
-        SELECT file_name, category, (fog_data(all_text)).*
+        SELECT file_name, last_update, category, (fog_data(all_text)).*
         FROM call_text"))
 
     dbDisconnect(pg)
@@ -58,7 +61,7 @@ file_names <-
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=-1)
+    as.data.frame(n=Inf)
 
 # Apply function to get fog data ----
 # Run on 12 cores.
