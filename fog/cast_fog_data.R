@@ -82,9 +82,7 @@ fog_decomposed <-
 
 other_measures_cast <-
     other_measures %>%
-    select(file_name, last_update, context, fk, lix, rix, ari, smog) %>%
-    mutate(category=sql("'anal_' || context")) %>%
-    select(-context) %>%
+    select(file_name, last_update, category, fk, lix, rix, ari, smog) %>%
     cast_df()
 
 call_level_tone_data <-

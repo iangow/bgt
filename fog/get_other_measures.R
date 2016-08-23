@@ -1,13 +1,21 @@
+library(dplyr)
 Sys.setenv(PGHOST="iangow.me", PGDATABASE="crsp")
 pg <- src_postgres()
 
-RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.other_measures")
 RPostgreSQL::dbGetQuery(pg$con, "SET work_mem='3GB'")
-syllable_data <-
-    tbl(pg, sql("SELECT * FROM streetevents.syllable_data"))
+syllable_data <- tbl(pg, sql("SELECT * FROM streetevents.syllable_data"))
 
-nchars <-
-    tbl(pg, sql("SELECT * FROM bgt.nchars"))
+category_sql <- "(CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context"
+
+speaker_data <- tbl(pg, sql("SELECT * FROM streetevents.speaker_data"))
+
+category <-
+    speaker_data %>%
+    filter(speaker_name != 'Operator') %>%
+    mutate(category = sql(category_sql)) %>%
+    select(file_name, last_update, context, speaker_number, category)
+
+nchars <- tbl(pg, sql("SELECT * FROM bgt.nchars"))
 
 # Flesch Kincaid: The Flesch-Kincaid Readability Index:
 # 0.39 * (number of words /  number of sentences)
@@ -40,10 +48,12 @@ smog_sql <- "CASE WHEN sent_count > 0
 ari_sql <- "CASE WHEN word_count > 0 AND sent_count > 0
             THEN 4.71 * (nchars / word_count) + 0.5 * (word_count / sent_count) - 21.43 END"
 
+RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.other_measures")
 system.time({
     processed <-
         syllable_data %>%
         inner_join(nchars) %>%
+        inner_join(category) %>%
         mutate(monosyl_count=sql("COALESCE((syllable_data->'syllable_counts'->'1')::text::float8, 0)"),
                bisyl_count=sql("COALESCE((syllable_data->'syllable_counts'->'2')::text::float8,0)")) %>%
         mutate(sent_count=sql("(syllable_data->'sent_count')::text::float8"),
@@ -51,16 +61,18 @@ system.time({
                word_7_count=sql("(syllable_data->'word_7_count')::text::float8"),
                num_syllables=sql("(syllable_data->'num_syllables')::text::float8")) %>%
         mutate(multisyl_count = word_count - monosyl_count - bisyl_count) %>%
-        select(-syllable_data) %>%
-        group_by(file_name, last_update, context) %>%
+        select(-syllable_data, -context, -speaker_number) %>%
+        group_by(file_name, last_update, category) %>%
         summarize_each(funs(sum)) %>%
         mutate(fk = sql(fk_sql),
                lix = sql(lix_sql),
                rix = sql(rix_sql),
                ari = sql(ari_sql),
                smog = sql(smog_sql)) %>%
-        compute(indexes=c("file_name", "last_update", "context"),
+        compute(indexes=c("file_name", "last_update", "category"),
                 name="other_measures", temporary=FALSE)
 })
 
 RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE other_measures SET SCHEMA bgt")
+
+other_measures <- tbl(pg, sql("SELECT * FROM bgt.other_measures"))
