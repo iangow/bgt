@@ -100,6 +100,24 @@ call_level_fl_data <-
     mutate(prop_fl_sents=num_fl_sents/num_sentences) %>%
     select(-num_sentences, -num_fl_sents)
 
+fog_by_half <- tbl(pg, sql("SELECT * FROM bgt.fog_by_half"))
+
+fog_early <-
+    fog_by_half %>%
+    filter(first_half) %>%
+    select(-first_half) %>%
+    rename(fog_early=fog)
+
+fog_late <-
+    fog_by_half %>%
+    filter(!first_half) %>%
+    select(-first_half) %>%
+    rename(fog_late=fog)
+
+fog_early_late <-
+    fog_early %>%
+    inner_join(fog_late)
+
 collect_fix <- function(df) {
     df %>%
         mutate(last_update=sql("last_update::text")) %>%
@@ -112,6 +130,7 @@ fog.data <-
     left_join(cast_df(fl_data)) %>%
     left_join(cast_df(tone_data)) %>%
     left_join(cast_df(random_feature)) %>%
+    left_join(cast_df(fog_early_late)) %>%
     left_join(collect_fix(call_level_tone_data)) %>%
     left_join(collect_fix(within_call_data)) %>%
     left_join(collect_fix(call_level_fl_data)) %>%
