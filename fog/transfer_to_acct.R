@@ -34,6 +34,11 @@ call_dates <-
 
 ticker_match <- tbl(pg, sql("SELECT * FROM streetevents.ticker_match"))
 
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update=max(last_update))
+
 # Given a GVKEY and release date, what is the correct PERMNO?
 rdqs <-
     fundq %>%
@@ -42,13 +47,14 @@ rdqs <-
 
 fog_data <-
     fog_recast %>%
+    semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
-    inner_join(crsp_linktable) %>%
     compute()
 
 fog_data_ticker <-
     fog_recast %>%
+    semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(ticker_match) %>%
     compute()
