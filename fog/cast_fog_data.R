@@ -127,7 +127,7 @@ collect_fix <- function(df) {
 fog.data <-
     other_measures_cast %>%
     left_join(cast_df(fog_decomposed)) %>%
-    left_join(cast_df(fl_data)) %>%
+    left_join(cast_df(fl_data %>% select(-num_sentences))) %>%
     left_join(cast_df(tone_data)) %>%
     left_join(cast_df(random_feature)) %>%
     left_join(cast_df(fog_early_late)) %>%
@@ -136,12 +136,6 @@ fog.data <-
     left_join(collect_fix(call_level_fl_data)) %>%
     inner_join(collect_fix(file_size))
 
-# TODO: Need to compare num_sentences measures.
-# fog.data %>%
-#     mutate(same_sent_count = num_sentences_fl==num_sentences_original) %>%
-#     group_by(same_sent_count) %>%
-#     summarize(count=n())
-
 # Send data to database ----
 rs <-
     RPostgreSQL::dbWriteTable(pg$con, c("bgt", "fog_recast"), fog.data,
@@ -149,7 +143,9 @@ rs <-
 
 rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
-        ALTER TABLE bgt.fog_recast ALTER last_update TYPE timestamp without time zone USING last_update::timestamp without time zone")
+        ALTER TABLE bgt.fog_recast ALTER last_update
+            TYPE timestamp without time zone
+            USING last_update::timestamp without time zone")
 
 rs <-
     RPostgreSQL::dbGetQuery(pg$con, "

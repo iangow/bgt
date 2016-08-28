@@ -40,14 +40,11 @@ rdqs <-
     select(gvkey, rdq) %>%
     distinct()
 
-
 fog_data <-
     fog_recast %>%
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
     inner_join(crsp_linktable) %>%
-    # filter(call_date >= linkdt,
-    #        call_date <= linkenddt | is.na(linkenddt)) %>%
     compute()
 
 fog_data_ticker <-
