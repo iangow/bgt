@@ -62,6 +62,9 @@ fog_data_ticker <-
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
 library(haven)
-write_sas(fog_data %>% as.data.frame(), "data/fog_data_new.sas7bdat")
-write_sas(fog_data_ticker %>% as.data.frame(), "data/fog_data_ticker_new.sas7bdat")
-
+fog_data <- fog_data %>% as.data.frame()
+fog_data_ticker <- fog_data_ticker %>% as.data.frame()
+save(fog_data, file="data/fog_data_new.Rdata")
+save(fog_data_ticker, file="data/fog_data_ticker_new.Rdata")
+system("/Applications/StatTransfer13/st data/fog_data_new.Rdata data/fog_data_new.sas7bdat -y")
+system("/Applications/StatTransfer13/st data/fog_data_ticker_new.Rdata data/fog_data_ticker_new.sas7bdat -y")
