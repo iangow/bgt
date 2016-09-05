@@ -45,11 +45,19 @@ rdqs <-
     select(gvkey, rdq) %>%
     distinct()
 
+rdq_link <-
+    rdqs %>%
+    inner_join(crsp_linktable) %>%
+    select(gvkey, permno, rdq) %>%
+    compute()
+
 fog_data <-
     fog_recast %>%
     semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
+    inner_join(rdq_link) %>%
+    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 fog_data_ticker <-
@@ -57,6 +65,8 @@ fog_data_ticker <-
     semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(ticker_match) %>%
+    inner_join(rdq_link) %>%
+    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 # Save data and convert to SAS format ----
