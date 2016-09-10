@@ -3,7 +3,7 @@
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
-if (!dbExistsTable(pg, c("bgt", "fog"))) {
+if (!dbExistsTable(pg, c("bgt_old", "fog"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt_old.fog
             (file_name text,
@@ -25,24 +25,26 @@ get_fog_data <- function(file_name) {
     pg <- dbConnect(PostgreSQL())
 
     # Get fog data
-    reg_data <- dbGetQuery(pg, paste0("
+    sql <- paste0("
         INSERT INTO bgt_old.fog (file_name, category,
                              fog, num_words, percent_complex,
                              num_sentences, fog_original, num_sentences_original)
         WITH raw_data AS (
-            SELECT file_name, last_update,
+            SELECT file_name,
                 (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context
                     AS category, speaker_text
-            FROM streetevents_old_old.speaker_data
+            FROM streetevents_old.speaker_data
             WHERE file_name='", file_name, "' AND speaker_name != 'Operator'),
 
         call_text AS (
-            SELECT file_name, last_update, category, string_agg(speaker_text, ' ') AS all_text
+            SELECT file_name, category, string_agg(speaker_text, ' ') AS all_text
             FROM raw_data
             GROUP BY file_name, category)
 
-        SELECT file_name, last_update, category, (fog_data(all_text)).*
-        FROM call_text"))
+        SELECT file_name, category, (fog_data(all_text)).*
+        FROM call_text")
+
+    reg_data <- dbGetQuery(pg, sql)
 
     dbDisconnect(pg)
 }
@@ -51,7 +53,7 @@ get_fog_data <- function(file_name) {
 library(dplyr)
 pg <- src_postgres()
 
-calls <- tbl(pg, sql("SELECT *  FROM streetevents_old.calls"))
+calls <- tbl(pg, sql("SELECT * FROM streetevents_old.calls"))
 
 processed <- tbl(pg, sql("SELECT * FROM bgt_old.fog"))
 
@@ -68,6 +70,6 @@ file_names <-
 pg <- dbConnect(PostgreSQL())
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name,
-                             get_fog_data, mc.cores=8))
+                             get_fog_data, mc.cores=6))
 
 rs <- dbDisconnect(pg)
