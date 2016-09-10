@@ -33,8 +33,8 @@ dbGetQuery(pg$con, "
 
 dbGetQuery(pg$con, "SET work_mem='3GB'")
 
-RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS random_feature")
-RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.random_feature")
+dbGetQuery(pg$con, "DROP TABLE IF EXISTS random_feature")
+dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.random_feature")
 
 random_feature <-
     long_words %>%
@@ -50,7 +50,7 @@ random_feature <-
     select(-long_words, -starts_with("match_count"), -word_count) %>%
     compute(name="random_feature", temporary=FALSE)
 
-RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE random_feature SET SCHEMA bgt")
+dbGetQuery(pg$con, "ALTER TABLE random_feature SET SCHEMA bgt")
 
 random_feature <- tbl(pg, sql("SELECT * FROM bgt.random_feature"))
 
