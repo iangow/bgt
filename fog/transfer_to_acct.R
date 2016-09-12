@@ -34,31 +34,48 @@ call_dates <-
 
 ticker_match <- tbl(pg, sql("SELECT * FROM streetevents.ticker_match"))
 
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update=max(last_update))
+
 # Given a GVKEY and release date, what is the correct PERMNO?
 rdqs <-
     fundq %>%
     select(gvkey, rdq) %>%
     distinct()
 
+rdq_link <-
+    rdqs %>%
+    inner_join(crsp_linktable) %>%
+    filter(rdq >= linkdt, rdq <= linkenddt | is.na(linkenddt)) %>%
+    select(gvkey, permno, rdq) %>%
+    compute()
 
 fog_data <-
     fog_recast %>%
+    semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
-    inner_join(crsp_linktable) %>%
-    # filter(call_date >= linkdt,
-    #        call_date <= linkenddt | is.na(linkenddt)) %>%
+    inner_join(rdq_link) %>%
+    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 fog_data_ticker <-
     fog_recast %>%
+    semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
     inner_join(ticker_match) %>%
+    inner_join(rdq_link) %>%
+    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
 library(haven)
-write_sas(fog_data %>% as.data.frame(), "data/fog_data_new.sas7bdat")
-write_sas(fog_data_ticker %>% as.data.frame(), "data/fog_data_ticker_new.sas7bdat")
-
+fog_data <- fog_data %>% as.data.frame()
+fog_data_ticker <- fog_data_ticker %>% as.data.frame()
+save(fog_data, file="data/fog_data_new.Rdata")
+save(fog_data_ticker, file="data/fog_data_ticker_new.Rdata")
+system("/Applications/StatTransfer13/st data/fog_data_new.Rdata data/fog_data_new.sas7bdat -y")
+system("/Applications/StatTransfer13/st data/fog_data_ticker_new.Rdata data/fog_data_ticker_new.sas7bdat -y")

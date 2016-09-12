@@ -82,9 +82,7 @@ fog_decomposed <-
 
 other_measures_cast <-
     other_measures %>%
-    select(file_name, last_update, context, fk, lix, rix, ari, smog) %>%
-    mutate(category=sql("'anal_' || context")) %>%
-    select(-context) %>%
+    select(file_name, last_update, category, fk, lix, rix, ari, smog) %>%
     cast_df()
 
 call_level_tone_data <-
@@ -102,6 +100,24 @@ call_level_fl_data <-
     mutate(prop_fl_sents=num_fl_sents/num_sentences) %>%
     select(-num_sentences, -num_fl_sents)
 
+fog_by_half <- tbl(pg, sql("SELECT * FROM bgt.fog_by_half"))
+
+fog_early <-
+    fog_by_half %>%
+    filter(first_half) %>%
+    select(-first_half) %>%
+    rename(fog_early=fog)
+
+fog_late <-
+    fog_by_half %>%
+    filter(!first_half) %>%
+    select(-first_half) %>%
+    rename(fog_late=fog)
+
+fog_early_late <-
+    fog_early %>%
+    inner_join(fog_late)
+
 collect_fix <- function(df) {
     df %>%
         mutate(last_update=sql("last_update::text")) %>%
@@ -111,19 +127,14 @@ collect_fix <- function(df) {
 fog.data <-
     other_measures_cast %>%
     left_join(cast_df(fog_decomposed)) %>%
-    left_join(cast_df(fl_data)) %>%
+    left_join(cast_df(fl_data %>% select(-num_sentences))) %>%
     left_join(cast_df(tone_data)) %>%
     left_join(cast_df(random_feature)) %>%
+    left_join(cast_df(fog_early_late)) %>%
     left_join(collect_fix(call_level_tone_data)) %>%
     left_join(collect_fix(within_call_data)) %>%
     left_join(collect_fix(call_level_fl_data)) %>%
     inner_join(collect_fix(file_size))
-
-# TODO: Need to compare num_sentences measures.
-# fog.data %>%
-#     mutate(same_sent_count = num_sentences_fl==num_sentences_original) %>%
-#     group_by(same_sent_count) %>%
-#     summarize(count=n())
 
 # Send data to database ----
 rs <-
@@ -132,7 +143,9 @@ rs <-
 
 rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
-        ALTER TABLE bgt.fog_recast ALTER last_update TYPE timestamp without time zone USING last_update::timestamp without time zone")
+        ALTER TABLE bgt.fog_recast ALTER last_update
+            TYPE timestamp without time zone
+            USING last_update::timestamp without time zone")
 
 rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
