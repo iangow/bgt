@@ -54,7 +54,7 @@ processed <- tbl(pg, sql("SELECT * FROM bgt.sent_counts"))
 
 file_names <-
     calls %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%

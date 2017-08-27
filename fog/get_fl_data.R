@@ -50,11 +50,11 @@ processed <- tbl(pg, sql("SELECT * FROM bgt.fl_data"))
 
 file_names <-
     calls %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=Inf)
+    collect(n=Inf)
 
 # Apply function to get data on forward-looking words ----
 # Run on 12 cores.
