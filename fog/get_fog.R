@@ -39,7 +39,7 @@ get_fog_data <- function(file_name) {
         call_text AS (
             SELECT file_name, last_update, category, string_agg(speaker_text, ' ') AS all_text
             FROM raw_data
-            GROUP BY file_name, category)
+            GROUP BY file_name, last_update, category)
 
         SELECT file_name, last_update, category, (fog_data(all_text)).*
         FROM call_text"))
@@ -48,8 +48,8 @@ get_fog_data <- function(file_name) {
 }
 
 # Get list of files without fog data ----
-library(dplyr)
-pg <- src_postgres()
+library(dplyr, warn.conflicts = FALSE)
+pg <- dbConnect(PostgreSQL())
 
 calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
 
@@ -57,17 +57,19 @@ processed <- tbl(pg, sql("SELECT * FROM bgt.fog"))
 
 file_names <-
     calls %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=Inf)
+    collect(n=Inf)
+
+dbDisconnect(pg)
 
 # Apply function to get fog data ----
 # Run on 12 cores.
 pg <- dbConnect(PostgreSQL())
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name,
-                             get_fog_data, mc.cores=8))
+                             get_fog_data, mc.cores=24))
 
 rs <- dbDisconnect(pg)
