@@ -6,7 +6,7 @@ pg <- dbConnect(PostgreSQL())
 if (!dbExistsTable(pg, c("bgt", "fog"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.fog
-            (file_name text, last_update timestamp without time zone,
+            (file_name text, last_update timestamp with time zone,
              category text,
              fog float8, num_words integer, percent_complex float8,
              num_sentences integer, fog_original float8,

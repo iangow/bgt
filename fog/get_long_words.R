@@ -7,7 +7,7 @@ if (!dbExistsTable(pg, c("bgt", "long_words"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.long_words
             (file_name text,
-             last_update timestamp without time zone,
+             last_update timestamp with time zone,
              category text,
              long_words text[])")
 
@@ -59,14 +59,14 @@ processed <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
 
 file_names <-
     calls %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=Inf)
+    collect(n=Inf)
 
 # Apply function to get data on long words ----
 # Run on 12 cores.
 library(parallel)
-system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=8,
+system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=24,
                              mc.preschedule=FALSE))

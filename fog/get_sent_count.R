@@ -5,7 +5,7 @@ pg <- dbConnect(PostgreSQL())
 if (!dbExistsTable(pg, c("bgt", "sent_counts"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.sent_counts
-            (file_name text, last_update timestamp without time zone,
+            (file_name text, last_update timestamp with time zone,
              category text, num_sentences integer)")
 
     rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.sent_counts (file_name)")

@@ -5,7 +5,7 @@ pg <- dbConnect(PostgreSQL())
 if (!dbExistsTable(pg, c("bgt", "fl_data"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.fl_data
-            (file_name text, last_update timestamp without time zone,
+            (file_name text, last_update timestamp with time zone,
                      category text, prop_fl_sents float8, num_sentences integer)")
 
     rs <- dbGetQuery(pg, "CREATE INDEX ON bgt.fl_data (file_name)")

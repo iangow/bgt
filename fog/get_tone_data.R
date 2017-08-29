@@ -2,12 +2,12 @@
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
-if (!dbExistsTable(pg, c("bgt", "sent_counts"))) {
+if (!dbExistsTable(pg, c("bgt", "tone_data"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.tone_data
             (
               file_name text,
-              last_update timestamp without time zone,
+              last_update timestamp with time zone,
               category text,
               word_count integer,
               litigious integer,
@@ -63,8 +63,8 @@ addToneData <- function(file_name) {
         dbWriteTable(pg, c("bgt", "tone_data"), tone_data,
                      append=TRUE, row.names=FALSE)
 
-        rs <- dbDisconnect(pg)
     }
+    rs <- dbDisconnect(pg)
 }
 
 # Get list of files to process ----
@@ -75,7 +75,7 @@ file_names <-  dbGetQuery(pg, "
     WITH files AS (
         SELECT file_name, last_update
         FROM streetevents.calls
-        WHERE call_type=1
+        WHERE event_type=1
         EXCEPT
         SELECT file_name, last_update
         FROM bgt.tone_data)
@@ -87,5 +87,4 @@ rs <- dbDisconnect(pg)
 # Apply function to get tone data ----
 # Run on 12 cores.
 library(parallel)
-system.time(temp <- mclapply(file_names$file_name, addToneData, mc.cores=8))
-rs <- dbDisconnect(pg)
+system.time(temp <- mclapply(file_names$file_name, addToneData, mc.cores=24))
