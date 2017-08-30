@@ -16,8 +16,8 @@ link_table AS (
     INNER JOIN streetevents.calls AS b
     USING (file_name)
     INNER JOIN crsp.stocknames AS c
-    ON a.permno=c.permno AND b.call_date >= c.namedt
-        AND (b.call_date <= c.nameenddt OR c.nameenddt IS NULL)
+    ON a.permno=c.permno AND b.start_date >= c.namedt
+        AND (b.start_date <= c.nameenddt OR c.nameenddt IS NULL)
     GROUP BY a.file_name)
 SELECT file_name, last_update, category,
     array_length(array_overlap(b.long_words,
