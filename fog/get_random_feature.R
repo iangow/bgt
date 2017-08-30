@@ -20,17 +20,6 @@ the_regex_3 <- get_regex()
 
 the_regex <- paste0("^[bgt]")
 
-dbGetQuery(pg$con, "
-    CREATE OR REPLACE FUNCTION regex_count(text[], text)
-    RETURNS bigint AS
-    $CODE$
-        WITH words AS (
-            SELECT UNNEST($1) AS word)
-        SELECT COUNT(*)
-        FROM words
-        WHERE word ~ $2
-    $CODE$ LANGUAGE sql IMMUTABLE STRICT")
-
 dbGetQuery(pg$con, "SET work_mem='3GB'")
 
 dbGetQuery(pg$con, "DROP TABLE IF EXISTS random_feature")
