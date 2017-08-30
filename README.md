@@ -31,9 +31,14 @@ system("psql -f fog/fog_decomposed.sql")
 - Run `transfer_to_acct.R` to produce `fog_data.sas7bdat` and `fog_data_ticker.sas7bdat`.
 - Run `data_test.R` to compare old and new data sets.
 
+### Sentence counts
+
+- Run `get_sent_counts.R`. 
+
 ### Forward-looking sentence data
 
-- 
+- Run `get_fl_data.R`. 
+- Relies on `prop_fl_sents` PL/Python function, which is created by `prop_fl_sents.sql`.
 
 ### Tone data
 
@@ -41,7 +46,7 @@ system("psql -f fog/fog_decomposed.sql")
 - `tone_count.sql`: Creates PL/Python function to get tone words. Depends on `bgt.lm_tone` table.
 - `get_tone_data.R`: Calculates tone variables for earnings conference calls and puts data in `bgt.tone_data`. 
 
-### Jargong word data
+### Jargon word data
 `top_words.sql`: Code to create PL/Python functions `word_counts` and `top_words`.
 `num_jargon_words.sql`
 
