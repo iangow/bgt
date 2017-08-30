@@ -28,7 +28,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2017-08-30 04:50:23 +0000</string>
+	<string>2017-08-30 05:12:55 +0000</string>
 	<key>Modifier</key>
 	<string>Ian Gow</string>
 	<key>NotesVisible</key>
@@ -123,6 +123,39 @@
 			<string>1 in = 1 in</string>
 			<key>GraphicsList</key>
 			<array>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>101</integer>
+					</dict>
+					<key>ID</key>
+					<integer>166</integer>
+					<key>Points</key>
+					<array>
+						<string>{828, 540}</string>
+						<string>{765, 270}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>0</string>
+							<key>Legacy</key>
+							<true/>
+							<key>TailArrow</key>
+							<string>FilledArrow</string>
+						</dict>
+					</dict>
+				</dict>
 				<dict>
 					<key>Class</key>
 					<string>LineGraphic</string>
@@ -356,7 +389,7 @@ syllable_data}</string>
 					<key>Points</key>
 					<array>
 						<string>{477, 135}</string>
-						<string>{468, 65.925001137780242}</string>
+						<string>{477, 74.925001137780242}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -385,7 +418,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{414, 18}, {108, 54}}</string>
+					<string>{{423, 27}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1634,7 +1667,7 @@ syllable_data}</string>
 					<key>Points</key>
 					<array>
 						<string>{729, 594}</string>
-						<string>{837, 432}</string>
+						<string>{855, 360}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1818,7 +1851,7 @@ syllable_data}</string>
 					<key>Points</key>
 					<array>
 						<string>{882, 504}</string>
-						<string>{963, 432}</string>
+						<string>{981, 396}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1856,7 +1889,7 @@ syllable_data}</string>
 					<key>Points</key>
 					<array>
 						<string>{882, 504}</string>
-						<string>{837, 432}</string>
+						<string>{855, 360}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2101,7 +2134,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{909, 378}, {108, 54}}</string>
+					<string>{{927, 342}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2131,7 +2164,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{783, 378}, {108, 54}}</string>
+					<string>{{801, 306}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -3822,7 +3855,7 @@ speaker_data}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>1</integer>
+		<integer>0</integer>
 		<key>Expanded_Canvases</key>
 		<array/>
 		<key>Frame</key>
@@ -3838,7 +3871,7 @@ speaker_data}</string>
 		<key>TopSlabHeight</key>
 		<real>250</real>
 		<key>VisibleRegion</key>
-		<string>{{-267, -143}, {1291, 839}}</string>
+		<string>{{35.5, 6}, {1276, 824}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
