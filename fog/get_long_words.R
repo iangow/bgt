@@ -30,7 +30,7 @@ addLongWordData <- function(file_name) {
     tone_raw <- dbGetQuery(pg, paste0("
         INSERT INTO bgt.long_words
         WITH raw_data AS (
-            SELECT file_name, last_update
+            SELECT file_name, last_update,
                 (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END)
                  || '_' || context AS category, speaker_text
             FROM streetevents.speaker_data
@@ -43,7 +43,7 @@ addLongWordData <- function(file_name) {
 
         SELECT file_name, last_update, category, array_agg(long_words)
         FROM long_words
-        GROUP BY file_name, category"))
+        GROUP BY file_name, last_update, category"))
 
     rs <- dbDisconnect(pg)
 }
@@ -68,5 +68,5 @@ file_names <-
 # Apply function to get data on long words ----
 # Run on 12 cores.
 library(parallel)
-system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=24,
+system.time(temp <- mclapply(file_names$file_name, addLongWordData, mc.cores=8,
                              mc.preschedule=FALSE))

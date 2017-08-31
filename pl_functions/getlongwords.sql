@@ -2,10 +2,6 @@ CREATE OR REPLACE FUNCTION public.getlongwords(
 	the_text text)
     RETURNS text[]
     LANGUAGE 'plpythonu'
-
-    COST 100
-    VOLATILE
-    ROWS 0
 AS $BODY$
 
     if 'nsyl' in SD:
