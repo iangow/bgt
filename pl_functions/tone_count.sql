@@ -3,9 +3,6 @@ CREATE OR REPLACE FUNCTION public.tone_count(
     RETURNS json
     LANGUAGE 'plpythonu'
 
-    COST 100
-    VOLATILE
-    ROWS 0
 AS $BODY$
 
     if 're' in SD:

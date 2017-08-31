@@ -3,10 +3,6 @@ CREATE OR REPLACE FUNCTION public.word_count(
 	min_length integer DEFAULT 1)
     RETURNS integer
     LANGUAGE 'plpythonu'
-
-    COST 100
-    VOLATILE
-    ROWS 0
 AS $BODY$
 
     """ Function to count the number of words in a passage of text.
