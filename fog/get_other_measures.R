@@ -1,8 +1,8 @@
-library(dplyr)
-Sys.setenv(PGHOST="iangow.me", PGDATABASE="crsp")
-pg <- src_postgres()
+library(dplyr, warn.conflicts = FALSE)
+library(RPostgreSQL)
+pg <- dbConnect(PostgreSQL())
 
-RPostgreSQL::dbGetQuery(pg$con, "SET work_mem='3GB'")
+RPostgreSQL::dbGetQuery(pg, "SET work_mem='3GB'")
 syllable_data <- tbl(pg, sql("SELECT * FROM streetevents.syllable_data"))
 
 category_sql <- "(CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context"
@@ -48,7 +48,7 @@ smog_sql <- "CASE WHEN sent_count > 0
 ari_sql <- "CASE WHEN word_count > 0 AND sent_count > 0
             THEN 4.71 * (nchars / word_count) + 0.5 * (word_count / sent_count) - 21.43 END"
 
-RPostgreSQL::dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.other_measures")
+RPostgreSQL::dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.other_measures")
 system.time({
     processed <-
         syllable_data %>%
@@ -63,7 +63,7 @@ system.time({
         mutate(multisyl_count = word_count - monosyl_count - bisyl_count) %>%
         select(-syllable_data, -context, -speaker_number) %>%
         group_by(file_name, last_update, category) %>%
-        summarize_each(funs(sum)) %>%
+        summarize_(funs(sum)) %>%
         mutate(fk = sql(fk_sql),
                lix = sql(lix_sql),
                rix = sql(rix_sql),
@@ -73,6 +73,9 @@ system.time({
                 name="other_measures", temporary=FALSE)
 })
 
-RPostgreSQL::dbGetQuery(pg$con, "ALTER TABLE other_measures SET SCHEMA bgt")
+dbGetQuery(pg, "ALTER TABLE other_measures OWNER TO bgt")
+dbGetQuery(pg, "ALTER TABLE other_measures SET SCHEMA bgt")
 
 other_measures <- tbl(pg, sql("SELECT * FROM bgt.other_measures"))
+
+dbDisconnect(pg)
