@@ -6,10 +6,6 @@ CREATE OR REPLACE FUNCTION public.sent_count(
 	raw_text text)
     RETURNS integer
     LANGUAGE 'plpythonu'
-
-    COST 100
-    VOLATILE
-    ROWS 0
 AS $BODY$
 
     """Function to count the number of sentences in a passage."""
