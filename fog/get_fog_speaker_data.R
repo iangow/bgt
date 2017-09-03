@@ -7,7 +7,7 @@ if (!dbExistsTable(pg, c("bgt", "fog_speaker"))) {
     rs <- dbGetQuery(pg, "
         CREATE TABLE bgt.fog_speaker
             (file_name text,
-             last_update timestamp without time zone,
+             last_update timestamp with time zone,
              context text,
              speaker_number integer,
              fog float8, num_words integer, percent_complex float8,
