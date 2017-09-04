@@ -3,7 +3,9 @@ library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
 
 RPostgreSQL::dbGetQuery(pg, "SET work_mem='3GB'")
-syllable_data <- tbl(pg, sql("SELECT * FROM streetevents.syllable_data"))
+syllable_data <-
+    tbl(pg, sql("SELECT * FROM streetevents.syllable_data")) %>%
+    select(-last_update)
 
 category_sql <- "(CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context"
 
