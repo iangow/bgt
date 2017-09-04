@@ -1,4 +1,4 @@
-# Get fog data ----
+    # Get fog data ----
 library(dplyr)
 library(tidyr)
 pg <- src_postgres()
@@ -29,7 +29,7 @@ latest_calls <-
     group_by(file_name) %>%
     summarize(last_update=max(last_update)) %>%
     inner_join(calls) %>%
-    select(file_name, last_update, call_date)
+    select(file_name, last_update, start_date)
 
 fog <-
     tbl_pg("fog") %>%
@@ -134,18 +134,13 @@ fog.data <-
     left_join(collect_fix(call_level_tone_data)) %>%
     left_join(collect_fix(within_call_data)) %>%
     left_join(collect_fix(call_level_fl_data)) %>%
-    inner_join(collect_fix(file_size))
+    inner_join(collect_fix(file_size)) %>%
+    mutate(last_update = as.POSIXct(last_update))
 
 # Send data to database ----
 rs <-
     RPostgreSQL::dbWriteTable(pg$con, c("bgt", "fog_recast"), fog.data,
                    overwrite=TRUE, row.names=FALSE)
-
-rs <-
-    RPostgreSQL::dbGetQuery(pg$con, "
-        ALTER TABLE bgt.fog_recast ALTER last_update
-            TYPE timestamp without time zone
-            USING last_update::timestamp without time zone")
 
 rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
@@ -156,6 +151,7 @@ fog_recast <- tbl_pg("fog_recast")
 
 merged.fog.data <-
     ticker_match %>%
+    select(-last_update) %>%
     inner_join(fog_recast) %>%
     mutate(fog_qa= 0.4 * (100*(num_complex_words_comp_qa+num_complex_words_anal_qa)/
         (num_words_comp_qa+num_words_anal_qa) +
@@ -173,7 +169,7 @@ merged.fog.data %>%
 
 long_words %>%
     inner_join(latest_calls) %>%
-    mutate(year=sql("extract(year from call_date)")) %>%
+    mutate(year=sql("extract(year from start_date)")) %>%
     group_by(year) %>%
     summarize(n()) %>%
     arrange(year) %>%
