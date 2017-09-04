@@ -1,6 +1,6 @@
 # Get fog data from database ----
-library(dplyr)
-
+library(dplyr, warn.conflicts = FALSE)
+library(RPostgreSQL)
 pg <- src_postgres()
 
 dbGetQuery(pg$con, "SET work_mem='3GB'")
@@ -65,7 +65,7 @@ fog_data_ticker <-
     fog_recast %>%
     semi_join(latest_calls) %>%
     inner_join(call_dates) %>%
-    inner_join(ticker_match) %>%
+    inner_join(ticker_match %>% select(-last_update)) %>%
     inner_join(rdq_link) %>%
     filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
