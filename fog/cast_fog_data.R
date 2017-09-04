@@ -71,7 +71,7 @@ cast_df <- function(df) {
 fog_decomposed <-
     jargon_words %>%
     inner_join(fog) %>%
-    inner_join(sent_counts) %>%
+    # inner_join(sent_counts %>% rename(num_sentences_py = num_sentences)) %>%
     mutate(num_words=sql("num_words::float8")) %>%
     mutate(fog_jargon=fog_jargon_sql,
            fog_special=fog_special_sql,
