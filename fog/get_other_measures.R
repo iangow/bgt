@@ -65,7 +65,7 @@ system.time({
         mutate(multisyl_count = word_count - monosyl_count - bisyl_count) %>%
         select(-syllable_data, -context, -speaker_number) %>%
         group_by(file_name, last_update, category) %>%
-        summarize_(funs(sum)) %>%
+        summarize_all(funs(sum)) %>%
         mutate(fk = sql(fk_sql),
                lix = sql(lix_sql),
                rix = sql(rix_sql),
