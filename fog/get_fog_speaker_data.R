@@ -41,17 +41,17 @@ processed <- tbl(pg, sql("SELECT * FROM bgt.fog_speaker"))
 
 file_names <-
     calls %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
     distinct() %>%
-    as.data.frame(n=-1)
+    collect(n = Inf)
 
 # Apply function to get fog data ----
 # Run on 12 cores.
 pg <- dbConnect(PostgreSQL())
 library(parallel)
 system.time(temp <- mclapply(file_names$file_name,
-                             addData, mc.cores=4))
+                             addData, mc.cores=24))
 
 rs <- dbDisconnect(pg)
