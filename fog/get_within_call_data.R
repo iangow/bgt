@@ -10,7 +10,7 @@ if (!dbExistsTable(pg, c("bgt", "within_call_data"))) {
 
         CREATE TABLE bgt.within_call_data
             (file_name text,
-             last_update timestamp without time zone,
+             last_update timestamp with time zone,
              r_squared float8, num_obs integer,
              constant float8,
              slope float8, mean_analyst_fog float8,
@@ -91,7 +91,9 @@ get_fog_reg_data <- function(file_name) {
             fog_questions %>%
             inner_join(fog_answers) %>%
             group_by(file_name, last_update) %>%
-            rename(y=fog_answers, x=fog_questions)
+            rename(y=fog_answers) %>%
+            rename(x=fog_questions) %>%
+            compute()
 
         reg_results <-
             reg_data %>%
@@ -123,7 +125,7 @@ dbGetQuery(pg$con, "SET work_mem='3GB'")
 # Get a list of file names for which we need to get within-call data.
 latest_update <-
     tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
-    filter(call_type==1L) %>%
+    filter(event_type==1L) %>%
     group_by(file_name) %>%
     summarize(last_update=max(last_update))
 
@@ -147,4 +149,4 @@ dbDisconnect(pg$con)
 # Apply function to get tone data. Run on several cores. ----
 library(parallel)
 # system.time(temp <- lapply(file_names$file_name, get_fog_reg_data))
-system.time(temp <- mclapply(file_names$file_name, get_fog_reg_data, mc.cores=8))
+system.time(temp <- mclapply(file_names$file_name, get_fog_reg_data, mc.cores=24))
