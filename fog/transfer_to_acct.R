@@ -28,8 +28,8 @@ crsp_link <-
 
 call_dates <-
     calls %>%
-    select(file_name, last_update, call_date) %>%
-    mutate(call_date=sql("call_date::date")) %>%
+    select(file_name, last_update, start_date) %>%
+    mutate(start_date=sql("start_date::date")) %>%
     compute()
 
 ticker_match <- tbl(pg, sql("SELECT * FROM streetevents.ticker_match"))
@@ -58,7 +58,7 @@ fog_data <-
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
     inner_join(rdq_link) %>%
-    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
+    filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 fog_data_ticker <-
@@ -67,7 +67,7 @@ fog_data_ticker <-
     inner_join(call_dates) %>%
     inner_join(ticker_match) %>%
     inner_join(rdq_link) %>%
-    filter(between(call_date, rdq, sql("rdq + interval '3 days'"))) %>%
+    filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute()
 
 # Save data and convert to SAS format ----
