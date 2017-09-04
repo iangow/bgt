@@ -14,7 +14,6 @@ long_words <- tbl_pg("long_words")
 other_measures <- tbl_pg("other_measures")
 within_call_data <- tbl_pg("within_call_data")
 
-ticker_match <- tbl(pg, sql("SELECT * FROM streetevents.ticker_match"))
 call_files <- tbl(pg, sql("SELECT * FROM streetevents.call_files"))
 calls <- tbl(pg, sql("SELECT * FROM streetevents.calls"))
 
@@ -72,7 +71,7 @@ cast_df <- function(df) {
 fog_decomposed <-
     jargon_words %>%
     inner_join(fog) %>%
-    # inner_join(sent_counts) %>%
+    inner_join(sent_counts) %>%
     mutate(num_words=sql("num_words::float8")) %>%
     mutate(fog_jargon=fog_jargon_sql,
            fog_special=fog_special_sql,
@@ -146,31 +145,3 @@ rs <-
     RPostgreSQL::dbGetQuery(pg$con, "
         SET maintenance_work_mem='5GB';
         CREATE INDEX ON bgt.fog_recast (file_name, last_update)")
-
-fog_recast <- tbl_pg("fog_recast")
-
-merged.fog.data <-
-    ticker_match %>%
-    select(-last_update) %>%
-    inner_join(fog_recast) %>%
-    mutate(fog_qa= 0.4 * (100*(num_complex_words_comp_qa+num_complex_words_anal_qa)/
-        (num_words_comp_qa+num_words_anal_qa) +
-        (num_words_comp_qa+num_words_anal_qa)*1.0/
-            (num_sentences_comp_qa+num_sentences_anal_qa)) )
-
-merged.fog.data %>% summarize(n())
-
-merged.fog.data %>%
-    mutate(year=sql("extract(year from datadate)")) %>%
-    group_by(year) %>%
-    summarize(n()) %>%
-    arrange(year) %>%
-    print(n=100)
-
-long_words %>%
-    inner_join(latest_calls) %>%
-    mutate(year=sql("extract(year from start_date)")) %>%
-    group_by(year) %>%
-    summarize(n()) %>%
-    arrange(year) %>%
-    print(n=100)

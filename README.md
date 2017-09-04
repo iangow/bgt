@@ -6,7 +6,7 @@
     - Depends on `streetevents.qa_pairs`. 
     - Produced by `within_call_regressions.R`.
 - `bgt.fog_recast`
-    - Depends on `bgt.fog_recast` and `bgt.ticker_match.
+    - Depends on `bgt.fog_recast`.
     - Produced by `fog/cast_fog_data.R`. 
 - `crsp.ccmxpf_linktable`
 - `streetevents.call_files`
