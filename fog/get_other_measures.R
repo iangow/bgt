@@ -14,7 +14,7 @@ speaker_data <- tbl(pg, sql("SELECT * FROM streetevents.speaker_data"))
 category <-
     speaker_data %>%
     filter(speaker_name != 'Operator') %>%
-    mutate(category = sql(category_sql)) %>%
+    mutate(category = sql("(CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END) || '_' || context")) %>%
     select(file_name, last_update, context, speaker_number, category)
 
 nchars <- tbl(pg, sql("SELECT * FROM bgt.nchars"))
@@ -50,7 +50,7 @@ smog_sql <- "CASE WHEN sent_count > 0
 ari_sql <- "CASE WHEN word_count > 0 AND sent_count > 0
             THEN 4.71 * (nchars / word_count) + 0.5 * (word_count / sent_count) - 21.43 END"
 
-RPostgreSQL::dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.other_measures")
+dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.other_measures")
 system.time({
     processed <-
         syllable_data %>%
@@ -66,11 +66,18 @@ system.time({
         select(-syllable_data, -context, -speaker_number) %>%
         group_by(file_name, last_update, category) %>%
         summarize_all(funs(sum)) %>%
-        mutate(fk = sql(fk_sql),
-               lix = sql(lix_sql),
-               rix = sql(rix_sql),
-               ari = sql(ari_sql),
-               smog = sql(smog_sql)) %>%
+        mutate(fk = sql("CASE WHEN sent_count > 0 AND word_count > 0
+              THEN .39 * (word_count /  sent_count) +
+               11.8 * (num_syllables / word_count) - 15.59
+              END"),
+               lix = sql("CASE WHEN sent_count > 0 AND word_count > 0
+    THEN (word_count /  sent_count) + (word_7_count * 100/ word_count) END"),
+               rix = sql("CASE WHEN sent_count > 0
+               THEN  word_7_count /sent_count END"),
+               ari = sql("CASE WHEN word_count > 0 AND sent_count > 0
+            THEN 4.71 * (nchars / word_count) + 0.5 * (word_count / sent_count) - 21.43 END"),
+               smog = sql("CASE WHEN sent_count > 0
+                THEN 1.043 * sqrt(30 * multisyl_count / sent_count) + 3.1291 END")) %>%
         compute(indexes=c("file_name", "last_update", "category"),
                 name="other_measures", temporary=FALSE)
 })
