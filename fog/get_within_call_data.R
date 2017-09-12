@@ -31,6 +31,8 @@ get_fog_reg_data <- function(file_name) {
 
     pg <- src_postgres()
 
+    qa_pairs <- tbl(pg, sql("SELECT * FROM streetevents.qa_pairs"))
+
     latest_update <-
         tbl(pg, sql("SELECT * FROM streetevents.calls")) %>%
         filter(file_name==file_name_str) %>%
@@ -57,7 +59,7 @@ get_fog_reg_data <- function(file_name) {
 
     if (nrows != 0) {
         questions <-
-            tbl(pg, sql("SELECT * FROM streetevents.qa_pairs")) %>%
+            qa_pairs %>%
             mutate(question_number=unnest(question_nums),
                    answer_number=unnest(answer_nums)) %>%
             select(file_name, last_update, question_nums, question_number, answer_number)
