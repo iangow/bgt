@@ -62,6 +62,8 @@ fog_data <-
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
 library(haven)
-fog_data <- fog_data %>% as.data.frame()
-save(fog_data, file="data/fog_data_new.Rdata")
+fog_data <- fog_data %>% collect()
+fog_data_save <- fog_data %>% as.data.frame()
+save(fog_data_save, file="data/fog_data_new.Rdata")
+rm(fog_data_save)
 system("/Applications/StatTransfer13/st data/fog_data_new.Rdata data/fog_data_new.sas7bdat -y")
