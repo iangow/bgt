@@ -85,6 +85,4 @@ system.time({
 dbGetQuery(pg, "ALTER TABLE other_measures OWNER TO bgt")
 dbGetQuery(pg, "ALTER TABLE other_measures SET SCHEMA bgt")
 
-other_measures <- tbl(pg, sql("SELECT * FROM bgt.other_measures"))
-
 dbDisconnect(pg)
