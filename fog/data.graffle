@@ -28,7 +28,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2017-09-03 22:18:45 +0000</string>
+	<string>2017-09-11 06:00:49 +0000</string>
 	<key>Modifier</key>
 	<string>Ian Gow</string>
 	<key>NotesVisible</key>
@@ -123,6 +123,159 @@
 			<string>1 in = 1 in</string>
 			<key>GraphicsList</key>
 			<array>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>175</integer>
+					</dict>
+					<key>ID</key>
+					<integer>177</integer>
+					<key>Points</key>
+					<array>
+						<string>{971.99999999999989, 414}</string>
+						<string>{1053, 540}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>0</string>
+							<key>Legacy</key>
+							<true/>
+							<key>TailArrow</key>
+							<string>FilledArrow</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>107</integer>
+						<key>Info</key>
+						<integer>3</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>174</integer>
+					</dict>
+					<key>ID</key>
+					<integer>176</integer>
+					<key>Points</key>
+					<array>
+						<string>{1053, 540}</string>
+						<string>{1053, 434.92500113778027}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>0</string>
+							<key>Legacy</key>
+							<true/>
+							<key>TailArrow</key>
+							<string>FilledArrow</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>175</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{999, 540}, {108, 54}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>175</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>ParallelLines</string>
+					<key>Text</key>
+					<dict>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\partightenfactor0
+
+\f0\fs20 \cf0 sics}</string>
+						<key>VerticalPad</key>
+						<real>0.0</real>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{999, 387}, {108, 54}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>174</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>DocumentShape</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Color</key>
+							<dict>
+								<key>b</key>
+								<real>1</real>
+								<key>g</key>
+								<real>0.40000000600000002</real>
+								<key>r</key>
+								<real>1</real>
+							</dict>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\partightenfactor0
+
+\f0\fs20 \cf0 create_sics.R}</string>
+						<key>VerticalPad</key>
+						<real>0.0</real>
+					</dict>
+				</dict>
 				<dict>
 					<key>Class</key>
 					<string>LineGraphic</string>
@@ -403,7 +556,7 @@
 					<integer>166</integer>
 					<key>Points</key>
 					<array>
-						<string>{828, 540}</string>
+						<string>{918, 594}</string>
 						<string>{765, 270}</string>
 					</array>
 					<key>Style</key>
@@ -422,6 +575,11 @@
 							<key>TailArrow</key>
 							<string>FilledArrow</string>
 						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>102</integer>
 					</dict>
 				</dict>
 				<dict>
@@ -897,7 +1055,7 @@ syllable_data}</string>
 					<integer>152</integer>
 					<key>Points</key>
 					<array>
-						<string>{117, 144}</string>
+						<string>{117, 135}</string>
 						<string>{207, 65.925001137780242}</string>
 					</array>
 					<key>Style</key>
@@ -937,7 +1095,7 @@ syllable_data}</string>
 					<integer>151</integer>
 					<key>Points</key>
 					<array>
-						<string>{351, 144}</string>
+						<string>{324, 135}</string>
 						<string>{261, 45}</string>
 					</array>
 					<key>Style</key>
@@ -1020,8 +1178,8 @@ syllable_data}</string>
 					<integer>145</integer>
 					<key>Points</key>
 					<array>
-						<string>{1242, 207}</string>
-						<string>{1242, 65.925001137780242}</string>
+						<string>{1377, 207}</string>
+						<string>{1377, 65.925001137780242}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1048,7 +1206,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1188, 18}, {108, 54}}</string>
+					<string>{{1323, 18}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1098,14 +1256,16 @@ syllable_data}</string>
 					<dict>
 						<key>ID</key>
 						<integer>126</integer>
+						<key>Info</key>
+						<integer>1</integer>
 					</dict>
 					<key>ID</key>
 					<integer>143</integer>
 					<key>Points</key>
 					<array>
-						<string>{657.43188945044938, 845.74806448723791}</string>
-						<string>{1089, 594}</string>
-						<string>{1089, 333}</string>
+						<string>{657.45690577431026, 845.79693076697333}</string>
+						<string>{1224, 594}</string>
+						<string>{1224, 333}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1182,8 +1342,8 @@ syllable_data}</string>
 					<integer>141</integer>
 					<key>Points</key>
 					<array>
-						<string>{1089, 279}</string>
-						<string>{1089, 254.92500113778024}</string>
+						<string>{1224, 279}</string>
+						<string>{1224, 254.92500113778024}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1220,8 +1380,8 @@ syllable_data}</string>
 					<integer>140</integer>
 					<key>Points</key>
 					<array>
-						<string>{1089, 207}</string>
-						<string>{1089, 65.925001137780242}</string>
+						<string>{1224, 207}</string>
+						<string>{1224, 65.925001137780242}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1260,7 +1420,7 @@ syllable_data}</string>
 					<integer>139</integer>
 					<key>Points</key>
 					<array>
-						<string>{1035, 234}</string>
+						<string>{1170, 234}</string>
 						<string>{981.00000000000011, 234}</string>
 					</array>
 					<key>Style</key>
@@ -1288,7 +1448,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1035, 18}, {108, 54}}</string>
+					<string>{{1170, 18}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1333,7 +1493,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1035, 207}, {108, 54}}</string>
+					<string>{{1170, 207}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1554,7 +1714,7 @@ syllable_data}</string>
 					<integer>132</integer>
 					<key>Points</key>
 					<array>
-						<string>{765, 144}</string>
+						<string>{765, 135}</string>
 						<string>{765, 65.925001137780242}</string>
 					</array>
 					<key>Style</key>
@@ -1702,7 +1862,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1035, 279}, {108, 54}}</string>
+					<string>{{1170, 279}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1742,8 +1902,8 @@ syllable_data}</string>
 					<integer>124</integer>
 					<key>Points</key>
 					<array>
-						<string>{792, 625.5}</string>
-						<string>{828, 621}</string>
+						<string>{792.00000000000011, 621}</string>
+						<string>{864, 621}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1777,14 +1937,16 @@ syllable_data}</string>
 					<dict>
 						<key>ID</key>
 						<integer>98</integer>
+						<key>Info</key>
+						<integer>1</integer>
 					</dict>
 					<key>ID</key>
 					<integer>123</integer>
 					<key>Points</key>
 					<array>
 						<string>{657, 846}</string>
-						<string>{1107, 648}</string>
-						<string>{1242, 333}</string>
+						<string>{1242, 648}</string>
+						<string>{1377, 333}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1823,8 +1985,8 @@ syllable_data}</string>
 					<integer>120</integer>
 					<key>Points</key>
 					<array>
-						<string>{1242, 279}</string>
-						<string>{1242, 254.92500113778024}</string>
+						<string>{1377, 279}</string>
+						<string>{1377, 254.92500113778024}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1930,17 +2092,12 @@ syllable_data}</string>
 				<dict>
 					<key>Class</key>
 					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>99</integer>
-					</dict>
 					<key>ID</key>
 					<integer>116</integer>
 					<key>Points</key>
 					<array>
-						<string>{729, 594}</string>
-						<string>{855, 360}</string>
+						<string>{1053, 387}</string>
+						<string>{918, 342}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1962,7 +2119,9 @@ syllable_data}</string>
 					<key>Tail</key>
 					<dict>
 						<key>ID</key>
-						<integer>112</integer>
+						<integer>174</integer>
+						<key>Info</key>
+						<integer>2</integer>
 					</dict>
 				</dict>
 				<dict>
@@ -1977,8 +2136,8 @@ syllable_data}</string>
 					<integer>115</integer>
 					<key>Points</key>
 					<array>
-						<string>{729, 674.5}</string>
-						<string>{729, 649.91250132741027}</string>
+						<string>{729, 675}</string>
+						<string>{729, 641.92500113778021}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2043,7 +2202,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{666, 594}, {126, 63}}</string>
+					<string>{{666, 594}, {126, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2066,7 +2225,7 @@ syllable_data}</string>
 {\*\expandedcolortbl;;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\partightenfactor0
 
-\f0\fs20 \cf0 num_jargon_words.sql}</string>
+\f0\fs20 \cf0 create_jargon_words.R}</string>
 						<key>VerticalPad</key>
 						<real>0.0</real>
 					</dict>
@@ -2085,8 +2244,8 @@ syllable_data}</string>
 					<integer>111</integer>
 					<key>Points</key>
 					<array>
-						<string>{882, 593.5}</string>
-						<string>{882, 551.92500113778021}</string>
+						<string>{918, 594}</string>
+						<string>{918, 434.92500113778027}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2123,8 +2282,8 @@ syllable_data}</string>
 					<integer>110</integer>
 					<key>Points</key>
 					<array>
-						<string>{882, 504}</string>
-						<string>{981, 396}</string>
+						<string>{1053, 387}</string>
+						<string>{1053, 342}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2146,7 +2305,7 @@ syllable_data}</string>
 					<key>Tail</key>
 					<dict>
 						<key>ID</key>
-						<integer>107</integer>
+						<integer>174</integer>
 					</dict>
 				</dict>
 				<dict>
@@ -2161,8 +2320,8 @@ syllable_data}</string>
 					<integer>108</integer>
 					<key>Points</key>
 					<array>
-						<string>{882, 504}</string>
-						<string>{855, 360}</string>
+						<string>{918, 387}</string>
+						<string>{918, 342}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2189,7 +2348,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{828, 504}, {108, 54}}</string>
+					<string>{{864, 387}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2227,7 +2386,7 @@ syllable_data}</string>
 {\*\expandedcolortbl;;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\partightenfactor0
 
-\f0\fs20 \cf0 word_freq.sql}</string>
+\f0\fs20 \cf0 create_word_freq.R}</string>
 						<key>VerticalPad</key>
 						<real>0.0</real>
 					</dict>
@@ -2245,7 +2404,7 @@ syllable_data}</string>
 					<key>Points</key>
 					<array>
 						<string>{765, 216}</string>
-						<string>{765, 191.92500113778024}</string>
+						<string>{765, 182.92500113778024}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2272,7 +2431,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{711, 144}, {108, 54}}</string>
+					<string>{{711, 135}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2347,7 +2506,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{828, 594}, {108, 54}}</string>
+					<string>{{864, 594}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2407,7 +2566,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{927, 342}, {108, 54}}</string>
+					<string>{{999, 288}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2437,7 +2596,7 @@ syllable_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{801, 306}, {108, 54}}</string>
+					<string>{{864, 288}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2468,7 +2627,7 @@ crsp_link}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1188, 279}, {108, 54}}</string>
+					<string>{{1323, 279}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2498,7 +2657,7 @@ crsp_link}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1188, 207}, {108, 54}}</string>
+					<string>{{1323, 207}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2861,7 +3020,7 @@ qa_pairs}</string>
 					<key>Points</key>
 					<array>
 						<string>{117, 288}</string>
-						<string>{117, 191.92500113778024}</string>
+						<string>{117, 182.92500113778024}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2918,7 +3077,7 @@ qa_pairs}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{63, 144}, {108, 54}}</string>
+					<string>{{63, 135}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -2963,80 +3122,12 @@ qa_pairs}</string>
 				</dict>
 				<dict>
 					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>48</integer>
-					</dict>
-					<key>ID</key>
-					<integer>83</integer>
-					<key>Points</key>
-					<array>
-						<string>{657.49978387723218, 846.01469952580089}</string>
-						<string>{963, 855}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>0</string>
-							<key>Legacy</key>
-							<true/>
-							<key>TailArrow</key>
-							<string>FilledArrow</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>59</integer>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{963, 828}, {126, 54}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>ID</key>
-					<integer>48</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{0, 1}</string>
-						<string>{0, -1}</string>
-						<string>{1, 0}</string>
-						<string>{-1, 0}</string>
-					</array>
-					<key>Shape</key>
-					<string>ParallelLines</string>
-					<key>Text</key>
-					<dict>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\partightenfactor0
-
-\f0\fs20 \cf0 ticker_match}</string>
-						<key>VerticalPad</key>
-						<real>0.0</real>
-					</dict>
-				</dict>
-				<dict>
-					<key>Class</key>
 					<string>Group</string>
 					<key>Graphics</key>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{1179, 729}, {126, 54}}</string>
+							<string>{{1278, 819}, {126, 54}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>ID</key>
@@ -3082,7 +3173,7 @@ speaker_data}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{1008, 729}, {126, 54}}</string>
+							<string>{{1107, 819}, {126, 54}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>ID</key>
@@ -3127,7 +3218,7 @@ speaker_data}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{981, 720}, {351, 81}}</string>
+							<string>{{1080, 810}, {351, 81}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>ID</key>
@@ -3169,8 +3260,8 @@ speaker_data}</string>
 					<integer>72</integer>
 					<key>Points</key>
 					<array>
-						<string>{351, 288}</string>
-						<string>{351, 191.92500113778024}</string>
+						<string>{324, 288}</string>
+						<string>{324, 182.92500113778024}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3197,7 +3288,7 @@ speaker_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{297, 144}, {108, 54}}</string>
+					<string>{{270, 135}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -3254,7 +3345,7 @@ speaker_data}</string>
 					<array>
 						<string>{603, 819}</string>
 						<string>{405, 540}</string>
-						<string>{351, 342}</string>
+						<string>{324, 342}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3281,7 +3372,7 @@ speaker_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{297, 288}, {108, 54}}</string>
+					<string>{{270, 288}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -3472,8 +3563,8 @@ speaker_data}</string>
 					<integer>45</integer>
 					<key>Points</key>
 					<array>
-						<string>{396, 1062}</string>
-						<string>{297, 965.92500113778021}</string>
+						<string>{657, 1062}</string>
+						<string>{855, 954}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3500,7 +3591,7 @@ speaker_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{243, 918}, {108, 54}}</string>
+					<string>{{855, 927}, {108, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -3560,7 +3651,7 @@ speaker_data}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{396, 1035}, {126, 54}}</string>
+					<string>{{531, 1035}, {126, 54}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -4092,9 +4183,9 @@ speaker_data}</string>
 		<key>Expanded_Canvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{0, 58}, {1440, 819}}</string>
+		<string>{{240, 59}, {1656, 998}}</string>
 		<key>ShowInfo</key>
-		<false/>
+		<true/>
 		<key>ShowRuler</key>
 		<true/>
 		<key>Sidebar</key>
@@ -4104,7 +4195,7 @@ speaker_data}</string>
 		<key>TopSlabHeight</key>
 		<real>250</real>
 		<key>VisibleRegion</key>
-		<string>{{0, 302}, {1409, 646}}</string>
+		<string>{{177, 0}, {1328, 825}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
