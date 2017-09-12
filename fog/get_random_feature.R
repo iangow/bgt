@@ -1,6 +1,6 @@
 library(dplyr)
 library(RPostgreSQL)
-pg <- src_postgres()
+pg <- dbConnect(PostgreSQL())
 
 long_words <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
 
@@ -20,10 +20,10 @@ the_regex_3 <- get_regex()
 
 the_regex <- paste0("^[bgt]")
 
-dbGetQuery(pg$con, "SET work_mem='3GB'")
+dbGetQuery(pg, "SET work_mem='3GB'")
 
-dbGetQuery(pg$con, "DROP TABLE IF EXISTS random_feature")
-dbGetQuery(pg$con, "DROP TABLE IF EXISTS bgt.random_feature")
+dbGetQuery(pg, "DROP TABLE IF EXISTS random_feature")
+dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.random_feature")
 
 random_feature <-
     long_words %>%
@@ -39,10 +39,8 @@ random_feature <-
     select(-long_words, -starts_with("match_count"), -word_count) %>%
     compute(name="random_feature", temporary=FALSE)
 
-dbGetQuery(pg$con, "ALTER TABLE random_feature SET SCHEMA bgt")
+dbGetQuery(pg, "ALTER TABLE random_feature OWNER TO bgt")
+dbGetQuery(pg, "ALTER TABLE random_feature SET SCHEMA bgt")
 
-random_feature <- tbl(pg, sql("SELECT * FROM bgt.random_feature"))
-
-random_feature %>%
-    arrange(file_name)
+dbDisconnect(pg)
 
