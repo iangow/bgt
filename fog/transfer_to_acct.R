@@ -29,7 +29,7 @@ crsp_link <-
 call_dates <-
     calls %>%
     select(file_name, last_update, start_date) %>%
-    mutate(start_date=sql("start_date::date")) %>%
+    mutate(call_date=sql("(start_date AT TIME ZONE 'America/New_York')::date")) %>%
     compute()
 
 latest_calls <-
