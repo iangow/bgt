@@ -46,7 +46,7 @@ rdqs <-
 rdq_link <-
     rdqs %>%
     inner_join(crsp_linktable) %>%
-    filter(rdq >= linkdt, rdq <= linkenddt | is.na(linkenddt)) %>%
+    filter(rdq >= linkdt | is.na(linkdt), rdq <= linkenddt | is.na(linkenddt)) %>%
     select(gvkey, permno, rdq) %>%
     compute()
 
