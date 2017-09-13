@@ -28,7 +28,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2017-09-11 06:00:49 +0000</string>
+	<string>2017-09-11 06:06:50 +0000</string>
 	<key>Modifier</key>
 	<string>Ian Gow</string>
 	<key>NotesVisible</key>
@@ -4183,7 +4183,7 @@ speaker_data}</string>
 		<key>Expanded_Canvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{240, 59}, {1656, 998}}</string>
+		<string>{{0, 58}, {1440, 819}}</string>
 		<key>ShowInfo</key>
 		<true/>
 		<key>ShowRuler</key>
@@ -4195,7 +4195,7 @@ speaker_data}</string>
 		<key>TopSlabHeight</key>
 		<real>250</real>
 		<key>VisibleRegion</key>
-		<string>{{177, 0}, {1328, 825}}</string>
+		<string>{{0, 0}, {1112, 646}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
