@@ -18,7 +18,6 @@ crsp_linktable <-
     compute(indexes="permno")
 
 fundq <- tbl(pg, sql("SELECT * FROM comp.fundq"))
-secm <- tbl(pg, sql("SELECT * FROM comp.secm"))
 
 fog_recast <- tbl(pg, sql("SELECT * FROM bgt.fog_recast"))
 
