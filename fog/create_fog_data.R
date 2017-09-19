@@ -1,9 +1,9 @@
 # Get fog data from database ----
 library(dplyr, warn.conflicts = FALSE)
 library(RPostgreSQL)
-pg <- src_postgres()
+pg <- dbConnect(PostgreSQL())
 
-dbGetQuery(pg$con, "SET work_mem='3GB'")
+dbGetQuery(pg, "SET work_mem='3GB'")
 
 calls <- tbl(pg, sql("SELECT * FROM streetevents.calls"))
 
@@ -60,7 +60,7 @@ fog_data <-
 
 dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.fog_data")
 dbGetQuery(pg, "ALTER TABLE fog_data OWNER TO bgt")
-dbGetQuery(pg$con, "ALTER TABLE fog_data SET SCHEMA bgt")
+dbGetQuery(pg, "ALTER TABLE fog_data SET SCHEMA bgt")
 
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
