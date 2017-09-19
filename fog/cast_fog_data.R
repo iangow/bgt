@@ -137,8 +137,8 @@ fog_early_late <-
 
 
 fog.data <-
-    other_measures_cast %>%
-    left_join(cast_df(fog_decomposed)) %>%
+    cast_df(fog_decomposed) %>%
+    left_join(other_measures_cast) %>%
     left_join(cast_df(fl_data %>% select(-num_sentences))) %>%
     left_join(cast_df(tone_data)) %>%
     left_join(cast_df(random_feature)) %>%
