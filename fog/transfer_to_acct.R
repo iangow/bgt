@@ -57,7 +57,11 @@ fog_data <-
     inner_join(crsp_link) %>%
     inner_join(rdq_link) %>%
     filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
-    compute()
+    compute(name="fog_data", temporary=FALSE)
+
+dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.fog_data")
+dbGetQuery(pg, "ALTER TABLE fog_data OWNER TO bgt")
+dbGetQuery(pg$con, "ALTER TABLE fog_data SET SCHEMA bgt")
 
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
