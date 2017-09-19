@@ -58,6 +58,11 @@ fog_data <-
     filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
     compute(name="fog_data", temporary=FALSE)
 
+fog_data_save <-
+    fog_data %>%
+    collect() %>%
+    as.data.frame()
+
 dbGetQuery(pg, "DROP TABLE IF EXISTS bgt.fog_data")
 dbGetQuery(pg, "ALTER TABLE fog_data OWNER TO bgt")
 dbGetQuery(pg, "ALTER TABLE fog_data SET SCHEMA bgt")
@@ -65,8 +70,6 @@ dbGetQuery(pg, "ALTER TABLE fog_data SET SCHEMA bgt")
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
 library(haven)
-fog_data <- fog_data %>% collect()
-fog_data_save <- fog_data %>% as.data.frame()
 save(fog_data_save, file="data/fog_data_new.Rdata")
 rm(fog_data_save)
 system("/Applications/StatTransfer13/st data/fog_data_new.Rdata data/fog_data_new.sas7bdat -y")
