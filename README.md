@@ -1,6 +1,21 @@
 # Process for creating `merged_fog_data.sas7bdat`
 
-## Tables used in final step
+## External tables used
+
+### StreetEvents
+
+- `streetevents.speaker_data`
+- `streetevents.calls`
+- `streetevents.crsp_link`
+- `streetevents.qa_pairs`
+
+### CRSP and Compustat
+
+- `crsp.ccmxpf_lnkhist`: For PERMNO-GVKEY links.
+- `comp.fundq`: For earnings release dates (`rdq`).
+- `crsp.stocknames`: For SIC codes.
+
+
 
 - `bgt.within_call_data`:
     - Depends on `streetevents.qa_pairs`. 
@@ -8,13 +23,10 @@
 - `bgt.fog_recast`
     - Depends on `bgt.fog_recast`.
     - Produced by `fog/cast_fog_data.R`. 
-- `crsp.ccmxpf_linktable`
-- `streetevents.call_files`
-- `streetevents.calls`
-- `comp.secm`
-- `comp.fundq`
+
 
 # Details for `bgt.fog_recast`
+
 
 - Re-arrange and merge fog data: `fog/cast_fog_data.R`
 - Upload Stata file `~/Dropbox/research/BuGT/data/merged_fog_data.dta` to ACCT
@@ -23,13 +35,9 @@
 
 - Run `get_fog_data.R` to produce `bgt.fog`
 
-```
-system("psql -f fog/fog_decomposed.sql")
-```
 - Run `fog_decomposed.sql`, which combines `bgt.fog` and `bgt.jargon_words` to produce `bgt.fog_decomposed`.
 - Run `cast_fog_data.R` to produce `bgt.fog_recast`.
-- Run `transfer_to_acct.R` to produce `fog_data.sas7bdat` and `fog_data_ticker.sas7bdat`.
-- Run `data_test.R` to compare old and new data sets.
+- Run `create_fog_data.R` to produce `bgt.fog_data`, `fog_data.Rdata` (R format), and `fog_data.sas7bdat` (SAS format).
 
 ### Sentence counts
 
