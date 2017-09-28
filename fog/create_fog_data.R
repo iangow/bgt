@@ -55,7 +55,7 @@ fog_data <-
     inner_join(call_dates) %>%
     inner_join(crsp_link) %>%
     inner_join(rdq_link) %>%
-    filter(between(start_date, rdq, sql("rdq + interval '3 days'"))) %>%
+    filter(between(start_date, sql("rdq - interval '1 day'"), sql("rdq + interval '3 days'"))) %>%
     compute(name="fog_data", temporary=FALSE)
 
 fog_data_save <-
