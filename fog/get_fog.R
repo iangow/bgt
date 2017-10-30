@@ -24,6 +24,9 @@ get_fog_data <- function(file_name) {
     library(RPostgreSQL)
     pg <- dbConnect(PostgreSQL())
 
+    dbGetQuery(pg,
+               sprintf("DELETE FROM bgt.fog WHERE file_name='%s'", file_name))
+
     # Get fog data
     reg_data <- dbGetQuery(pg, paste0("
         INSERT INTO bgt.fog (file_name, last_update, category,
@@ -55,8 +58,14 @@ calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
 
 processed <- tbl(pg, sql("SELECT * FROM bgt.fog"))
 
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update = max(last_update))
+
 file_names <-
     calls %>%
+    inner_join(latest_calls) %>%
     filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%

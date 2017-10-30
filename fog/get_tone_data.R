@@ -28,6 +28,9 @@ addToneData <- function(file_name) {
     library(RPostgreSQL)
     pg <- dbConnect(PostgreSQL())
 
+    dbGetQuery(pg,
+               sprintf("DELETE FROM bgt.tone_data WHERE file_name='%s'", file_name))
+
     # Get tone data. Data is JSON converted to text.
     tone_raw <- dbGetQuery(pg, paste0("
         WITH
@@ -71,17 +74,24 @@ addToneData <- function(file_name) {
 # Get a list of file names for which we need to get tone data.
 pg <- dbConnect(PostgreSQL())
 
-file_names <-  dbGetQuery(pg, "
-    WITH files AS (
-        SELECT file_name, last_update
-        FROM streetevents.calls
-        WHERE event_type=1
-        EXCEPT
-        SELECT file_name, last_update
-        FROM bgt.tone_data)
-    SELECT DISTINCT file_name
-    FROM files
-")
+calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
+
+processed <- tbl(pg, sql("SELECT * FROM bgt.tone_data"))
+
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update = max(last_update))
+
+file_names <-
+    calls %>%
+    inner_join(latest_calls) %>%
+    filter(event_type==1L) %>%
+    anti_join(processed) %>%
+    select(file_name) %>%
+    distinct() %>%
+    collect(n=Inf)
+
 rs <- dbDisconnect(pg)
 
 # Apply function to get tone data ----

@@ -26,8 +26,11 @@ addLongWordData <- function(file_name) {
 
     rs <- dbGetQuery(pg, "SET work_mem='1GB'")
 
+    dbGetQuery(pg,
+               sprintf("DELETE FROM bgt.long_words WHERE file_name='%s'", file_name))
+
     # Get tone data. Data is JSON converted to text.
-    tone_raw <- dbGetQuery(pg, paste0("
+    dbGetQuery(pg, paste0("
         INSERT INTO bgt.long_words
         WITH raw_data AS (
             SELECT file_name, last_update,
@@ -57,8 +60,14 @@ calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
 
 processed <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
 
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update = max(last_update))
+
 file_names <-
     calls %>%
+    inner_join(latest_calls) %>%
     filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%

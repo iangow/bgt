@@ -20,15 +20,25 @@ add_fl_data <- function(file_name) {
     library(RPostgreSQL)
     pg <- dbConnect(PostgreSQL())
 
+    dbGetQuery(pg,
+               sprintf("DELETE FROM bgt.fog WHERE file_name='%s'", file_name))
+
     # Get tone data. Data is JSON converted to text.
     rs <- dbGetQuery(pg, paste0("
 
-        WITH raw_data AS (
+        WITH latest_calls AS (
+            SELECT file_name, max(last_update) AS last_update
+            FROM streetevents.calls
+            GROUP BY file_name),
+
+        raw_data AS (
             SELECT file_name, last_update, speaker_name, speaker_number,
                 unnest(sent_tokenize(speaker_text)) AS sents,
                 (CASE WHEN role='Analyst' THEN 'anal' ELSE 'comp' END)
                     || '_' || context AS category
             FROM streetevents.speaker_data
+            INNER_JOIN lastest_calls
+            USING (file_name, last_update)
             WHERE speaker_name != 'Operator' AND file_name = '", file_name, "')
         INSERT INTO bgt.fl_data (file_name, last_update, category, prop_fl_sents, num_sentences)
         SELECT file_name, last_update, category, prop_fl_sents(array_agg(sents)),
@@ -48,8 +58,14 @@ calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
 
 processed <- tbl(pg, sql("SELECT * FROM bgt.fl_data"))
 
+latest_calls <-
+    calls %>%
+    group_by(file_name) %>%
+    summarize(last_update = max(last_update))
+
 file_names <-
     calls %>%
+    inner_join(latest_calls) %>%
     filter(event_type==1L) %>%
     anti_join(processed) %>%
     select(file_name) %>%
