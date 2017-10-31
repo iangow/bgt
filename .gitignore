@@ -4,13 +4,9 @@
 .*.swp
 *.html
 *.html
-data/*.Rdata
 cache
-*.docx
 *.pdf
-fog_math.tex
 *.log
 *.synctex.gz
 *-concordance.tex
-elf_sample_cache
 *.xlsx
