@@ -70,5 +70,8 @@ dbGetQuery(pg, "ALTER TABLE fog_data SET SCHEMA bgt")
 # Save data and convert to SAS format ----
 if (!dir.exists("data")) dir.create("data")
 library(haven)
-save(fog_data_save, file="data/fog_data_new.sas7bdat")
+write_sas(fog_data_save, path="data/fog_data_new.sas7bdat")
+
+library(readr)
+write_csv(fog_data_save, path="data/fog_data_new.csv")
 rm(fog_data_save)
