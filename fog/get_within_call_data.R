@@ -99,10 +99,7 @@ get_fog_reg_data <- function(file_name) {
 
         reg_results <-
             reg_data %>%
-            summarize(r_squared=regr_r2(y, x),
-                      num_obs=regr_count(y, x),
-                      constant=regr_intercept(y, x),
-                      slope=regr_slope(y, x),
+            summarize(num_obs=regr_count(y, x),
                       mean_analyst_fog=regr_avgx(y, x),
                       mean_manager_fog=regr_avgy(y, x)) %>%
             collect() %>%
