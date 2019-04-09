@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-psql -f fog/fog.sql
+psql -f pl_functions/fog_data.sql
