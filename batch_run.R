@@ -1,5 +1,4 @@
-
-
+#!/usr/bin/env Rscript
 source('fog/get_fog.R', echo=TRUE)
 source('fog/get_fog_speaker_data.R', echo=TRUE)
 source('fog/get_within_call_data.R', echo=TRUE)
@@ -11,6 +10,6 @@ source('fog/get_fl_data.R', echo=TRUE)
 source('fog/get_long_words.R', echo=TRUE)
 source('fog/create_word_freq.R', echo=TRUE)
 source('fog/create_sics.R', echo=TRUE)
-source('fog/create_jargon_words.R', echo=TRUE)
+# source('fog/create_jargon_words.R', echo=TRUE)
 source("fog/cast_fog_data.R", echo = TRUE)
 source("fog/create_fog_data.R", echo = TRUE)

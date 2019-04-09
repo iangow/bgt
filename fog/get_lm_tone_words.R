@@ -1,10 +1,10 @@
-
-category <- c("positive", "negative", "uncertainty", 
+#!/usr/bin/env Rscript
+category <- c("positive", "negative", "uncertainty",
                 "litigious", "modal_strong", "modal_weak")
 
 base_url <- "http://www3.nd.edu/~mcdonald/Data/Finance_Word_Lists"
 
-url <- file.path(base_url, 
+url <- file.path(base_url,
                  c("LoughranMcDonald_Positive.csv",
                    "LoughranMcDonald_Negative.csv",
                    "LoughranMcDonald_Uncertainty.csv",
@@ -15,7 +15,7 @@ url <- file.path(base_url,
 df <- data.frame(category, url, stringsAsFactors=FALSE)
 
 getWords <- function(url) {
-    words <- read.csv(url, as.is=TRUE)    
+    words <- read.csv(url, as.is=TRUE)
     paste(words[,1], collapse=",")
 }
 df$words <- unlist(lapply(df$url, getWords))

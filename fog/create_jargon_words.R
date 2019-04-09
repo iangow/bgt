@@ -1,10 +1,13 @@
+#!/usr/bin/env Rscript
 library(RPostgreSQL)
 library(dplyr, warn.conflicts = FALSE)
 pg <- dbConnect(PostgreSQL())
 
-word_freq <- tbl(pg, sql("SELECT * FROM bgt.word_freq"))
-sics <- tbl(pg, sql("SELECT * FROM bgt.sics"))
-long_words <- tbl(pg, sql("SELECT * FROM bgt.long_words"))
+rs <- dbExecute(pg, "SET search_path TO bgt, public")
+
+word_freq <- tbl(pg, "word_freq")
+sics <- tbl(pg, "sics")
+long_words <- tbl(pg, "long_words")
 
 top_words <-
     word_freq %>%

@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(RPostgreSQL)
 library(dplyr, warn.conflicts = FALSE)
 pg <- dbConnect(PostgreSQL())

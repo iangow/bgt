@@ -1,4 +1,4 @@
-
+#!/usr/bin/env Rscript
 # Create a table to store the data ----
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())
@@ -54,14 +54,14 @@ get_fog_data <- function(file_name) {
 library(dplyr, warn.conflicts = FALSE)
 pg <- dbConnect(PostgreSQL())
 
-calls <- tbl(pg, sql("SELECT *  FROM streetevents.calls"))
+calls <- tbl(pg, sql("SELECT * FROM streetevents.calls"))
 
 processed <- tbl(pg, sql("SELECT * FROM bgt.fog"))
 
 latest_calls <-
     calls %>%
     group_by(file_name) %>%
-    summarize(last_update = max(last_update))
+    summarize(last_update = max(last_update, na.rm = TRUE))
 
 file_names <-
     calls %>%

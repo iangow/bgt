@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(dplyr)
 
 # Create a table to store the data ----

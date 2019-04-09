@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(dplyr)
 library(RPostgreSQL)
 pg <- src_postgres()

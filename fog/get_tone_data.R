@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # Create a table to store sent_counts data ----
 library(RPostgreSQL)
 pg <- dbConnect(PostgreSQL())

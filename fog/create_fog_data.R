@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # Get fog data from database ----
 library(dplyr, warn.conflicts = FALSE)
 library(RPostgreSQL)
